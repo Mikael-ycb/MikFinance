@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { WalletMinimalIcon } from "lucide-react";
-import Image from "next/image";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "MikFinance",
+  description: "Your persoanl finance app with AI",
+};
 
 export default function Home() {
   return (

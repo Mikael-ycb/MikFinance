@@ -7,8 +7,14 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className=" space-y-4">
-      <section id="header"></section>
+    <div className="p-2 space-y-4">
+      <section id="header">
+        <h1 className="text-4xl font-bold text-primary">Dashboard</h1>
+        <p>
+          Get Insights into your spanding, track your expenses, and manage your
+          money
+        </p>
+      </section>
       <section id="content"></section>
     </div>
   );

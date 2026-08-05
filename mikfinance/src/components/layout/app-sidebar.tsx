@@ -3,14 +3,33 @@
 import { usePathname } from "next/navigation";
 import {
   Sidebar,
+  SidebarContent,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
 import Link from "next/link";
-import { WalletIcon } from "lucide-react";
+import {
+  ArrowRightLeftIcon,
+  LayoutDashboardIcon,
+  WalletIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
+const sidebarItems = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboardIcon />,
+    href: "/dashboard",
+  },
+  {
+    label: "Transaction",
+    icon: <ArrowRightLeftIcon />,
+    href: "/dashboard/Transaction",
+  },
+];
 export function AppSidebar() {
   const pathname = usePathname();
   return (
@@ -27,6 +46,31 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {sidebarItems.map((item) => (
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.label}
+                  className={cn(
+                    "py-6 px-5 text-md",
+                    pathname === item.href
+                      ? "bg-primary text-primary-foreground font-semibold hover:bg-primary hover:text-primary-foreground"
+                      : "",
+                  )}
+                >
+                  <Link href={item.href}>
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
     </Sidebar>
   );
 }

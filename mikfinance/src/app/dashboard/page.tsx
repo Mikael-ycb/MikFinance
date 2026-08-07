@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { BalanceCards } from "./_components/balance-cards";
 
 export const metadata: Metadata = {
   title: "MikFinance - DashBoard",
@@ -15,7 +16,9 @@ export default function DashboardPage() {
           money
         </p>
       </section>
-      <section id="content"></section>
+      <section id="content">
+        <BalanceCards />
+      </section>
     </div>
   );
 }

@@ -9,13 +9,14 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { getTransactions } from "@/features/transaction/action";
-import { convertToIDR } from "@/lib/utils";
+import { cn, convertToIDR } from "@/lib/utils";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Fragment } from "react/jsx-runtime";
 
@@ -78,14 +79,22 @@ export default function TransactionTable({
                     </TableCell>
                     <TableCell>{transaction.description}</TableCell>
                     <TableCell>{transaction.category}</TableCell>
-                    <TableCell className="font-semibold text-right">
+                    <TableCell
+                      className={cn(
+                        "font-semibold",
+                        transaction.type === "expense"
+                          ? "text-destructive"
+                          : "text-green-500",
+                      )}
+                    >
+                      {transaction.type === "expense" && "-"}
                       {convertToIDR(transaction.amount)}
                     </TableCell>
                     <TableCell className="flex">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-yellow-400"
+                        className="text-muted-foreground hover:text-yellow-500"
                         onClick={() => {}}
                       >
                         <PencilIcon className="size-4" />
@@ -103,6 +112,14 @@ export default function TransactionTable({
                   </TableRow>
                 ))}
             </TableBody>
+            {isLoading && (
+              <TableCaption className="mb-4">Loading...</TableCaption>
+            )}
+            {!isLoading && transactions?.data?.length === 0 && (
+              <TableCaption className="mb-4">
+                No transactions found
+              </TableCaption>
+            )}
           </Table>
         </CardContent>
       </Card>

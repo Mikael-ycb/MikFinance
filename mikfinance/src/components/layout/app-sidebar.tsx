@@ -27,14 +27,14 @@ const sidebarItems = [
   {
     label: "Transaction",
     icon: <ArrowRightLeftIcon />,
-    href: "/dashboard/Transaction",
+    href: "/dashboard/transaction",
   },
 ];
 export function AppSidebar() {
   const pathname = usePathname();
   return (
     <Sidebar collapsible="icon" variant="floating">
-      <SidebarHeader className="gap-2 flex-row items-center">
+      <SidebarHeader className="flex-row items-center gap-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>

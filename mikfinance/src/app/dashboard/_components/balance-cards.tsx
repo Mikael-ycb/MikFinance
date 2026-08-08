@@ -35,7 +35,7 @@ export function BalanceCards() {
             Saving
           </CardTitle>
           <CardDescription className="text-2xl font-semibold text-secondary-foreground">
-            {convertToIDR(Number(data?.savings)) || 0}
+            {convertToIDR(Number(data?.savings || 0))}
           </CardDescription>
         </CardHeader>
         <CardFooter className="text-sm">Saving For All Time</CardFooter>
@@ -48,7 +48,7 @@ export function BalanceCards() {
             Income
           </CardTitle>
           <CardDescription className="text-2xl font-semibold text-secondary-foreground">
-            {convertToIDR(Number(data?.totalIncome)) || 0}
+            {convertToIDR(Number(data?.totalIncome || 0))}
           </CardDescription>
         </CardHeader>
         <CardFooter className="text-sm">Total Income For All Time</CardFooter>
@@ -61,7 +61,7 @@ export function BalanceCards() {
             Expenses
           </CardTitle>
           <CardDescription className="text-2xl font-semibold text-secondary-foreground">
-            {convertToIDR(Number(data?.totalExpense)) || 0}
+            {convertToIDR(Number(data?.totalExpense || 0))}
           </CardDescription>
         </CardHeader>
         <CardFooter className="text-sm">Total Expense For All Time</CardFooter>

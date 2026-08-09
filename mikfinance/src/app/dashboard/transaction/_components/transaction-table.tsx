@@ -7,6 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -150,6 +157,30 @@ export default function TransactionTable({
                 </SelectContent>
               </Select>
             </div>
+            {transactions?.totalPages && transactions?.totalPages > 1 && (
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        page === 1
+                          ? setPage(Number(transactions?.totalPages))
+                          : setPage(page - 1)
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        page === Number(transactions?.totalPages)
+                          ? setPage(1)
+                          : setPage(page + 1)
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -32,6 +32,7 @@ import { getTransactions } from "@/features/transaction/action";
 import { cn, convertToIDR } from "@/lib/utils";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Select } from "radix-ui/select";
+import { useEffect, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
 
 const TABLE_HEADER = [
@@ -64,6 +65,18 @@ export default function TransactionTable({
   isLoading: boolean;
   refetch: () => void;
 }) {
+  const [localSearch, setLocalSearch] = useState(search);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== search) {
+        setSearch(localSearch);
+        setPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  });
+
   return (
     <Fragment>
       <Card className="w-full gap-2">
@@ -71,6 +84,15 @@ export default function TransactionTable({
           <div>
             <CardTitle>Recent Transaction</CardTitle>
             <CardDescription>Your latest financial activities</CardDescription>
+          </div>
+
+          <div>
+            <input
+              placeholder="Search...."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              className="w-full"
+            />
           </div>
         </CardHeader>
 
@@ -157,7 +179,7 @@ export default function TransactionTable({
                 </SelectContent>
               </Select>
             </div>
-            {transactions?.totalPages && transactions?.totalPages > 1 && (
+            {transactions?.totalPages && transactions?.totalPages > 1 ? (
               <Pagination className="mx-0 w-auto">
                 <PaginationContent>
                   <PaginationItem>
@@ -180,6 +202,8 @@ export default function TransactionTable({
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
+            ) : (
+              ""
             )}
           </div>
         </CardContent>

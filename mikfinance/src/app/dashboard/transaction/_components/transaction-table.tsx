@@ -7,6 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCaption,
@@ -18,6 +24,7 @@ import {
 import { getTransactions } from "@/features/transaction/action";
 import { cn, convertToIDR } from "@/lib/utils";
 import { PencilIcon, Trash2Icon } from "lucide-react";
+import { Select } from "radix-ui/select";
 import { Fragment } from "react/jsx-runtime";
 
 const TABLE_HEADER = [
@@ -121,6 +128,29 @@ export default function TransactionTable({
               </TableCaption>
             )}
           </Table>
+          <div className="flex justify-between items-center mt-4">
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground">Rows per page</div>
+              <Select
+                value={limit.toString()}
+                onValueChange={(value) => {
+                  setLimit(Number(value));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-20">
+                  <SelectValue placeholder={limit.toString()} />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 10, 20, 50, 100].map((size) => (
+                    <SelectItem key={`limit-${size}`} value={size.toString()}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </Fragment>

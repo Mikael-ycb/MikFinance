@@ -30,6 +30,7 @@ import { format } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 import { createTransaction } from "@/features/transaction/action";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const formScema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -78,7 +79,9 @@ export default function CreateTransactionCard({
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formScema>) => {};
+  const onSubmit = (data: z.infer<typeof formScema>) => {
+    mutate(data);
+  };
 
   return (
     <Card className="w-full gap-2">
@@ -198,6 +201,13 @@ export default function CreateTransactionCard({
                 </Field>
               )}
             />
+            <Button
+              size="lg"
+              type="submit"
+              disabled={!form.formState.isValid || isPending}
+            >
+              {isPending ? "Creating..." : "Create Transaction"}
+            </Button>
           </FieldGroup>
         </form>
       </CardContent>

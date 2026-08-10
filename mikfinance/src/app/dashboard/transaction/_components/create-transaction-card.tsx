@@ -17,6 +17,19 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
+import { createTransaction } from "@/features/transaction/action";
+import { toast } from "sonner";
 
 const formScema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -44,6 +57,27 @@ export default function CreateTransactionCard({
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: z.infer<typeof formScema>) => {
+      const formatedData = {
+        ...data,
+        amount: parseFloat(data.amount),
+      };
+
+      return createTransaction(formatedData);
+    },
+    onSuccess: () => {
+      form.reset();
+      refetch();
+      toast.success("Transaction created successfully");
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create transaction",
+      );
+    },
+  });
+
   const onSubmit = (data: z.infer<typeof formScema>) => {};
 
   return (
@@ -67,6 +101,96 @@ export default function CreateTransactionCard({
                     placeholder="0,00"
                     autoComplete="off"
                     type="number"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="type"
+              render={({ field, fieldState }) => (
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="form-type">Type</FieldLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="form-type">
+                      <SelectValue placeholder="Select type" />
+                      <SelectContent>
+                        <SelectItem value="income">Income</SelectItem>
+                        <SelectItem value="expense">Expance</SelectItem>
+                      </SelectContent>
+                    </SelectTrigger>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="category"
+              render={({ field, fieldState }) => (
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="form-category">Category</FieldLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="form-category">
+                      <SelectValue placeholder="Select category" />
+                      <SelectContent>
+                        <SelectItem value="Food & Drink">
+                          Food & Drink
+                        </SelectItem>
+                        <SelectItem value="Transport">Transport</SelectItem>
+                        <SelectItem value="Reword">Reword</SelectItem>
+                        <SelectItem value="Salary">Salary</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </SelectTrigger>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="date"
+              render={({ field, fieldState }) => (
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="form-date">Date</FieldLabel>
+                  <DatePicker
+                    id="form-date"
+                    value={field.value ? new Date(field.value) : undefined}
+                    onChange={(date) =>
+                      field.onChange(date ? format(date, "yyyy-MM-dd") : "")
+                    }
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="description"
+              render={({ field, fieldState }) => (
+                <Field className="gap-1">
+                  <FieldLabel htmlFor="form-description">
+                    Description
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="form-description"
+                    placeholder="Enter description"
+                    autoComplete="off"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

@@ -1,3 +1,4 @@
+import { Transaction } from "@/app/types/transaction";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +35,7 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import { Select } from "radix-ui/select";
 import { useEffect, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
+import DeleteTransactionDialog from "./delete-transaction-dialog";
 
 const TABLE_HEADER = [
   "#",
@@ -76,6 +78,11 @@ export default function TransactionTable({
     }, 500);
     return () => clearTimeout(timer);
   });
+
+  const [selectedTransaction, setSelectedTransaction] = useState<{
+    data: Omit<Transaction, "user_id" | "embedding">;
+    action: "edit" | "delete";
+  } | null>(null);
 
   return (
     <Fragment>
@@ -140,7 +147,12 @@ export default function TransactionTable({
                         variant="ghost"
                         size="icon"
                         className="text-muted-foreground hover:text-destructive"
-                        onClick={() => {}}
+                        onClick={() => {
+                          setSelectedTransaction({
+                            data: transaction,
+                            action: "delete",
+                          });
+                        }}
                       >
                         <Trash2Icon className="size-4" />
                       </Button>
@@ -208,6 +220,12 @@ export default function TransactionTable({
           </div>
         </CardContent>
       </Card>
+
+      <DeleteTransactionDialog
+        selectedTransaction={selectedTransaction}
+        setSelectedTransaction={setSelectedTransaction}
+        refetch={refetch}
+      ></DeleteTransactionDialog>
     </Fragment>
   );
 }

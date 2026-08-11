@@ -19,12 +19,12 @@ export default function DeleteTransactionDialog({
   refetch,
 }: {
   selectedTransaction: {
-    data: Transaction;
+    data: Omit<Transaction, "user_id" | "embedding">;
     action: "edit" | "delete";
-  };
+  } | null;
   setSelectedTransaction: Dispatch<
     SetStateAction<{
-      data: Transaction;
+      data: Omit<Transaction, "user_id" | "embedding">;
       action: "edit" | "delete";
     } | null>
   >;
@@ -48,7 +48,7 @@ export default function DeleteTransactionDialog({
 
   return (
     <Dialog
-      open={selectedTransaction && selectedTransaction.action === "delete"}
+      open={!!selectedTransaction && selectedTransaction.action === "delete"}
       onOpenChange={() => setSelectedTransaction(null)}
     >
       <DialogContent className="gap-4">
@@ -70,7 +70,9 @@ export default function DeleteTransactionDialog({
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() => mutate(selectedTransaction.data.id)}
+            onClick={() => {
+              if (selectedTransaction) mutate(selectedTransaction.data.id);
+            }}
           >
             {isPending ? "Deleting..." : "Delete"}
           </Button>

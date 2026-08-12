@@ -45,7 +45,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
-export default function IpdateTransactionDialog({
+export default function UpdateTransactionDialog({
   selectedTransaction,
   setSelectedTransaction,
   refetch,
@@ -114,7 +114,7 @@ export default function IpdateTransactionDialog({
         description: selectedTransaction.data.description,
       });
     }
-  }, [selectedTransaction]);
+  }, [selectedTransaction, form]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     mutate({
@@ -190,16 +190,17 @@ export default function IpdateTransactionDialog({
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="form-category">
                         <SelectValue placeholder="Select category" />
-                        <SelectContent>
-                          <SelectItem value="Food & Drink">
-                            Food & Drink
-                          </SelectItem>
-                          <SelectItem value="Transport">Transport</SelectItem>
-                          <SelectItem value="Reword">Reword</SelectItem>
-                          <SelectItem value="Salary">Salary</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
                       </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="Food & Drink">
+                          Food & Drink
+                        </SelectItem>
+                        <SelectItem value="Transport">Transport</SelectItem>
+                        <SelectItem value="Reward">Reward</SelectItem>
+                        <SelectItem value="Salary">Salary</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
                     </Select>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -252,6 +253,7 @@ export default function IpdateTransactionDialog({
           </DialogHeader>
           <DialogFooter className="mt-4">
             <Button
+              type="button"
               variant="ghost"
               onClick={() => setSelectedTransaction(null)}
               disabled={isPending}

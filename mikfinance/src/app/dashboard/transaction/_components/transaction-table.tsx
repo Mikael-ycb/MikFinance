@@ -78,7 +78,7 @@ export default function TransactionTable({
       }
     }, 500);
     return () => clearTimeout(timer);
-  });
+  }, [localSearch, search, setSearch, setPage]);
 
   const [selectedTransaction, setSelectedTransaction] = useState<{
     data: Omit<Transaction, "user_id" | "embedding">;

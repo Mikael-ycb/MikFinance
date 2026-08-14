@@ -114,7 +114,7 @@ export default function UpdateTransactionDialog({
         description: selectedTransaction.data.description,
       });
     }
-  }, [selectedTransaction, form]);
+  }, [selectedTransaction]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     mutate({

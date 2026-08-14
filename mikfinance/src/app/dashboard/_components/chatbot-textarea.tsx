@@ -44,7 +44,7 @@ export default function ChatbotTextarea() {
             type="submit"
             size="icon"
             variant="ghost"
-            className="text-primary hover:bg-primary/10 disabled bg-transparent"
+            className="text-primary hover:bg-primary/10 hover:text-primary cursor-pointer disabled:bg-transparent"
           >
             <SendIcon className="size-5" />
           </Button>

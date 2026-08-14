@@ -8,12 +8,14 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import ChatbotTextarea from "./chatbot-textarea";
 
 export default function ChatbotDrawer() {
   const [conversation, setConversation] = useState<
@@ -85,10 +87,16 @@ export default function ChatbotDrawer() {
                 >
                   <div
                     className={cn("flex flex-col w-full", {
-                      "bg-primary/20 text-primary px-5 py-2 rounded-3xl rounted-br-md w-fit max-w-3/4":
+                      "bg-primary/20 text-primary px-5 py-2 rounded-3xl rounded-br-md w-fit max-w-3/4":
                         message.role === "user",
                     })}
                   >
+                    {message.role === "model" && (
+                      <div className="flex items-center gap-1 text-sm font-semibold text-primary">
+                        <BotIcon className="size-4" />
+                        <span>Mik AI </span>
+                      </div>
+                    )}
                     {message.parts[0].text}
                   </div>
                 </div>
@@ -101,6 +109,9 @@ export default function ChatbotDrawer() {
             </div>
           )}
         </div>
+        <DrawerFooter>
+          <ChatbotTextarea></ChatbotTextarea>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

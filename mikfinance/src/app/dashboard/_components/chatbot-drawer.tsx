@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import ChatbotTextarea from "./chatbot-textarea";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ChatbotDrawer() {
   const [conversation, setConversation] = useState<
@@ -25,24 +26,34 @@ export default function ChatbotDrawer() {
         text: string;
       }[];
     }[]
-  >([
-    {
+  >([]);
+
+  const { mutate: handleChatMutation, isPending } = useMutation({
+    mutationFn: handleChat,
+    onSuccess: (response) => {
+      const botMessage = {
+        role: "model",
+        parts: [{ text: response || "Terjadi Kesalahan" }],
+      };
+      setConversation((prev) => [...prev, botMessage]);
+    },
+    onError: (error) => {
+      const botMessage = {
+        role: "model",
+        parts: [{ text: "Terjadi Kesalahan" + error.message }],
+      };
+      setConversation((prev) => [...prev, botMessage]);
+    },
+  });
+
+  function sendMessage(message: string) {
+    const newMessage = {
       role: "user",
-      parts: [
-        {
-          text: "Hello",
-        },
-      ],
-    },
-    {
-      role: "model",
-      parts: [
-        {
-          text: "Hello, how can i help you?",
-        },
-      ],
-    },
-  ]);
+      parts: [{ text: message }],
+    };
+    setConversation((prev) => [...prev, newMessage]);
+    handleChatMutation(message);
+  }
 
   return (
     <Drawer direction="right" modal={false}>
@@ -110,7 +121,7 @@ export default function ChatbotDrawer() {
           )}
         </div>
         <DrawerFooter>
-          <ChatbotTextarea></ChatbotTextarea>
+          <ChatbotTextarea sendMessage={sendMessage} />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

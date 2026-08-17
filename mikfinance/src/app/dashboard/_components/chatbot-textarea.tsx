@@ -9,7 +9,11 @@ const formScema = z.object({
   message: z.string().min(1, "Message is required"),
 });
 
-export default function ChatbotTextarea() {
+export default function ChatbotTextarea({
+  sendMessage,
+}: {
+  sendMessage: (message: string) => void;
+}) {
   const form = useForm<z.infer<typeof formScema>>({
     resolver: zodResolver(formScema),
     defaultValues: {
@@ -18,10 +22,14 @@ export default function ChatbotTextarea() {
   });
 
   function onSubmit(data: z.infer<typeof formScema>) {
+    sendMessage(data.message);
     form.reset();
   }
   return (
-    <form className="flex flex-col p-2 bg-secondary rounded-2xl">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex flex-col p-2 bg-secondary rounded-2xl"
+    >
       <Controller
         control={form.control}
         name="message"

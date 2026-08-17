@@ -13,13 +13,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import ChatbotTextarea from "./chatbot-textarea";
 import { useMutation } from "@tanstack/react-query";
 import Markdown from "react-markdown";
 
 export default function ChatbotDrawer() {
+  const chatRef = useRef<HTMLDivElement>(null);
   const [conversation, setConversation] = useState<
     {
       role: string;
@@ -56,6 +57,15 @@ export default function ChatbotDrawer() {
     handleChatMutation(message);
   }
 
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current?.scrollTo({
+        top: chatRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [conversation]);
+
   return (
     <Drawer direction="right" modal={false}>
       <DrawerTrigger className="fixed bottom-4 right-4" asChild>
@@ -88,7 +98,10 @@ export default function ChatbotDrawer() {
         </DrawerHeader>
         <div className="no-scrollbar overflow-y-auto px-4 h-full">
           {conversation.length > 0 ? (
-            <div className="flex-col h-full overflow-x-hidden no-scrollbar overflow-y-auto gap-8">
+            <div
+              ref={chatRef}
+              className="flex-col h-full overflow-x-hidden no-scrollbar overflow-y-auto gap-8"
+            >
               {conversation.map((message, index) => (
                 <div
                   key={`conversation-${index}`}

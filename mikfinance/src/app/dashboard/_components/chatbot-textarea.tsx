@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SendIcon } from "lucide-react";
+import { KeyboardEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -25,6 +26,14 @@ export default function ChatbotTextarea({
     sendMessage(data.message);
     form.reset();
   }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit(form.getValues());
+    }
+  }
+
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
@@ -41,6 +50,7 @@ export default function ChatbotTextarea({
               placeholder="Ask Mik AI here"
               autoComplete="off"
               className="h-16 px-3 py-2 rounded-md resize-none focus:outline-none"
+              onKeyDown={handleKeyDown}
             />
           </Field>
         )}

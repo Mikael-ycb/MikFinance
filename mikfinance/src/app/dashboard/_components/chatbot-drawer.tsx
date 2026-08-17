@@ -17,6 +17,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import ChatbotTextarea from "./chatbot-textarea";
 import { useMutation } from "@tanstack/react-query";
+import Markdown from "react-markdown";
 
 export default function ChatbotDrawer() {
   const [conversation, setConversation] = useState<
@@ -108,7 +109,13 @@ export default function ChatbotDrawer() {
                         <span>Mik AI </span>
                       </div>
                     )}
-                    {message.parts[0].text}
+                    {message.role === "model" ? (
+                      <div className="response-ai">
+                        <Markdown>{message.parts[0].text}</Markdown>
+                      </div>
+                    ) : (
+                      message.parts[0].text
+                    )}
                   </div>
                 </div>
               ))}

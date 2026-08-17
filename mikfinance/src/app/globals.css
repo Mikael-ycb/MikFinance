@@ -121,10 +121,65 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
+  }
+}
+
+@utility response-ai {
+  @apply flex w-3/4 flex-col flex-wrap;
+
+  p {
+    @apply my-2 w-full text-wrap;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply my-2 w-full font-semibold text-wrap;
+  }
+
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h4 {
+    @apply text-base;
+  }
+
+  h5 {
+    @apply text-sm;
+  }
+
+  h6 {
+    @apply text-xs;
+  }
+
+  ul {
+    @apply w-full space-y-1 text-wrap;
+  }
+
+  li {
+    @apply list-disc lict-inside text-wrap;
+  }
+
+  pre {
+    @apply w-full text-wrap;
   }
 }

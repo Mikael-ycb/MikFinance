@@ -155,7 +155,7 @@
     @apply text-2xl;
   }
 
-  h2 {
+  h3 {
     @apply text-xl;
   }
 
@@ -176,7 +176,7 @@
   }
 
   li {
-    @apply list-disc lict-inside text-wrap;
+    @apply list-disc list-inside text-wrap;
   }
 
   pre {

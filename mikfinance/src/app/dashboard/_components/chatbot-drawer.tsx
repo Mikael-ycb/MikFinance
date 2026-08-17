@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { handleChat } from "@/features/ai/chat";
-import { BotIcon, XIcon } from "lucide-react";
+import { BotIcon, EllipsisIcon, XIcon } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -69,14 +69,7 @@ export default function ChatbotDrawer() {
   return (
     <Drawer direction="right" modal={false}>
       <DrawerTrigger className="fixed bottom-4 right-4" asChild>
-        <Button
-          className="size-14 rounded-full"
-          size="icon-lg"
-          // onClick={async () => {
-          //   const result = await handleChat();
-          //   console.log(result);
-          // }}
-        >
+        <Button className="size-14 rounded-full" size="icon-lg">
           <BotIcon className="size-6" />
         </Button>
       </DrawerTrigger>
@@ -132,6 +125,12 @@ export default function ChatbotDrawer() {
                   </div>
                 </div>
               ))}
+
+              {isPending && (
+                <div className="flex items-center animate-pulse">
+                  <EllipsisIcon className="size-8 text-primary/50" />
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full">

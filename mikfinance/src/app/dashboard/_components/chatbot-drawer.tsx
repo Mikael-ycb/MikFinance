@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { handleChat, handleChatWithThinking } from "@/features/ai/chat";
-import { BotIcon, EllipsisIcon, XIcon } from "lucide-react";
+import { BotIcon, ChevronDownIcon, EllipsisIcon, XIcon } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -151,11 +151,16 @@ export default function ChatbotDrawer() {
                           <div key={`response-ai-${index}${indexPart}`}>
                             {part.thought ? (
                               <Collapsible>
-                                <CollapsibleTrigger>
-                                  Tampilkan alur berpikir
+                                <CollapsibleTrigger asChild>
+                                  <Button variant="ghost">
+                                    Tampilkan alur Mik berpikir
+                                    <ChevronDownIcon />
+                                  </Button>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                  <Markdown>{part.text}</Markdown>
+                                  <div className="ml-4 pl-2 border-l">
+                                    <Markdown>{part.text}</Markdown>
+                                  </div>
                                 </CollapsibleContent>
                               </Collapsible>
                             ) : (

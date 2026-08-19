@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { Toggle } from "@/components/ui/toggle";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SendIcon } from "lucide-react";
 import { KeyboardEvent } from "react";
@@ -56,7 +57,11 @@ export default function ChatbotTextarea({
         )}
       />
       <div className="flex justify-between">
-        <div></div>
+        <div>
+          <Toggle variant="outline" size="sm">
+            Thinking
+          </Toggle>
+        </div>
         <div>
           <Button
             type="submit"

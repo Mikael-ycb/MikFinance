@@ -35,6 +35,7 @@ export default function ChatbotDrawer() {
       }[];
     }[]
   >([]);
+  const [isThinking, setIsThinking] = useState<boolean>(false);
 
   const { mutate: handleChatMutation, isPending } = useMutation({
     mutationFn: ({
@@ -101,7 +102,7 @@ export default function ChatbotDrawer() {
       parts: [{ text: message }],
     };
     setConversation((prev) => [...prev, newMessage]);
-    handleChatMutation({ message, isThinking: false });
+    handleChatMutation({ message, isThinking });
   }
 
   useEffect(() => {
@@ -207,7 +208,11 @@ export default function ChatbotDrawer() {
           )}
         </div>
         <DrawerFooter>
-          <ChatbotTextarea sendMessage={sendMessage} />
+          <ChatbotTextarea
+            isThinking={isThinking}
+            setIsThinking={setIsThinking}
+            sendMessage={sendMessage}
+          />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

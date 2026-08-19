@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { handleChat, handleChatWithThinking } from "@/features/ai/chat";
+import { handleChat } from "@/features/ai/chat";
 import { BotIcon, ChevronDownIcon, EllipsisIcon, XIcon } from "lucide-react";
 import {
   Drawer,
@@ -37,11 +37,28 @@ export default function ChatbotDrawer() {
   >([]);
 
   const { mutate: handleChatMutation, isPending } = useMutation({
-    mutationFn: handleChat,
+    mutationFn: ({
+      message,
+      isThinking,
+    }: {
+      message: string;
+      isThinking: boolean;
+    }) => handleChat(message, isThinking),
     onSuccess: (response) => {
+      let parts: {
+        text: string;
+        thought?: boolean;
+      }[] = [];
+
+      if (response?.thought !== "") {
+        parts = [
+          ...parts,
+          { thought: true, text: response?.thought || "Terjadi Kesalahan" },
+        ];
+      }
       const botMessage = {
         role: "model",
-        parts: [{ text: response || "Terjadi Kesalahan" }],
+        parts: [...parts, { text: response?.answer || "Terjadi Kesalahan" }],
       };
       setConversation((prev) => [...prev, botMessage]);
     },
@@ -54,29 +71,29 @@ export default function ChatbotDrawer() {
     },
   });
 
-  const {
-    mutate: handleChatWithThinkingMutation,
-    isPending: isPendingChatWithThinking,
-  } = useMutation({
-    mutationFn: handleChatWithThinking,
-    onSuccess: (response) => {
-      const botMessage = {
-        role: "model",
-        parts: [
-          { thought: true, text: response?.thought || "Terjadi Kesalahan" },
-          { text: response?.answer || "Terjadi Kesalahan" },
-        ],
-      };
-      setConversation((prev) => [...prev, botMessage]);
-    },
-    onError: (error) => {
-      const botMessage = {
-        role: "model",
-        parts: [{ text: "Terjadi Kesalahan" + error.message }],
-      };
-      setConversation((prev) => [...prev, botMessage]);
-    },
-  });
+  // const {
+  //   mutate: handleChatWithThinkingMutation,
+  //   isPending: isPendingChatWithThinking,
+  // } = useMutation({
+  //   mutationFn: handleChatWithThinking,
+  //   onSuccess: (response) => {
+  //     const botMessage = {
+  //       role: "model",
+  //       parts: [
+  //         { thought: true, text: response?.thought || "Terjadi Kesalahan" },
+  //         { text: response?.answer || "Terjadi Kesalahan" },
+  //       ],
+  //     };
+  //     setConversation((prev) => [...prev, botMessage]);
+  //   },
+  //   onError: (error) => {
+  //     const botMessage = {
+  //       role: "model",
+  //       parts: [{ text: "Terjadi Kesalahan" + error.message }],
+  //     };
+  //     setConversation((prev) => [...prev, botMessage]);
+  //   },
+  // });
 
   function sendMessage(message: string) {
     const newMessage = {
@@ -84,7 +101,7 @@ export default function ChatbotDrawer() {
       parts: [{ text: message }],
     };
     setConversation((prev) => [...prev, newMessage]);
-    handleChatWithThinkingMutation(message);
+    handleChatMutation({ message, isThinking: false });
   }
 
   useEffect(() => {
@@ -176,7 +193,7 @@ export default function ChatbotDrawer() {
                 </div>
               ))}
 
-              {isPendingChatWithThinking && (
+              {isPending && (
                 <div className="flex items-center animate-pulse">
                   <EllipsisIcon className="size-8 text-primary/50" />
                 </div>

@@ -43,14 +43,25 @@ export async function handleChat(message: string, isThinking: boolean) {
   return result;
 }
 
-export async function handleChatWithThinking(message: string) {
-  const response = await ai.models.generateContent({
+export async function* handleChatStreaming(
+  message: string,
+  isThinking: boolean,
+) {
+  const response = await ai.models.generateContentStream({
     model: "gemini-3-flash-preview",
     contents: message,
     config: {
       thinkingConfig: {
-        includeThoughts: true,
+        includeThoughts: isThinking,
+        thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
+        thinkingBudget: isThinking ? -1 : 0,
       },
     },
   });
+
+  for await (const chunk of response) {
+    if (chunk.text) {
+      yield chunk.text;
+    }
+  }
 }

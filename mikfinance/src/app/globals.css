@@ -139,6 +139,10 @@
     @apply my-2 leading-6;
   }
 
+  div {
+    @apply max-w-full;
+  }
+
   /* Headings */
   h1 {
     @apply mt-4 mb-2 text-2xl font-bold tracking-tight text-foreground;

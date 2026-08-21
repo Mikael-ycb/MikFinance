@@ -59,9 +59,26 @@ export async function* handleChatStreaming(
     },
   });
 
-  for await (const chunk of response) {
-    if (chunk.text) {
-      yield chunk.text;
+  if (isThinking) {
+    for await (const chunk of response) {
+      const parts = chunk.candidates?.[0]?.content?.parts;
+      if (parts) {
+        for (const part of parts) {
+          if (!part.text) {
+            continue;
+          } else if (part.thought) {
+            yield `[thounght]${part.text}`;
+          } else {
+            yield part.text;
+          }
+        }
+      }
+    }
+  } else {
+    for await (const chunk of response) {
+      if (chunk.text) {
+        yield chunk.text;
+      }
     }
   }
 }

@@ -53,8 +53,8 @@ export async function* handleChatStreaming(
     config: {
       thinkingConfig: {
         includeThoughts: isThinking,
-        thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
-        thinkingBudget: isThinking ? -1 : 0,
+        // thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
+        // thinkingBudget: isThinking ? -1 : 0,
       },
     },
   });

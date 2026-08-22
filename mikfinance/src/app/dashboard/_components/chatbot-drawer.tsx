@@ -73,56 +73,70 @@ export default function ChatbotDrawer() {
   // });
 
   const { mutate: handleChatMutation, isPending } = useMutation({
-    mutationFn: async ({
-      message,
-      isThinking,
-    }: {
-      message: string;
-      isThinking: boolean;
-    }) => {
-      setConversation((prev) => [
-        ...prev,
-        { role: "model", parts: [{ text: "" }] },
-      ]);
-      const response = await handleChatStreaming(message, isThinking);
-      for await (const chunk of response) {
-        setConversation((prev) => {
-          const newConversation = [...prev];
-          const lastIndex = newConversation.length - 1;
+    mutationFn: async ({ isThinking }: { isThinking: boolean }) => {
+      if (isThinking) {
+        setConversation((prev) => [
+          ...prev,
+          { role: "model", parts: [{ thought: true, text: "" }, { text: "" }] },
+        ]);
+        const response = await handleChatStreaming(conversation, isThinking);
+        for await (const chunk of response) {
+          setConversation((prev) => {
+            const newConversation = [...prev];
+            const lastIndex = newConversation.length - 1;
 
-          newConversation[lastIndex] = {
-            ...newConversation[lastIndex],
-            parts: [{ text: newConversation[lastIndex].parts[0].text + chunk }],
-          };
-          return newConversation;
-        });
+            const parts = newConversation[lastIndex].parts;
+
+            newConversation[lastIndex] = {
+              ...newConversation[lastIndex],
+              parts: [
+                {
+                  ...parts[0],
+                  text: chunk.startsWith("[thounght]")
+                    ? parts[0].text + chunk.replace("[thounght]", "")
+                    : parts[0].text,
+                },
+                {
+                  text: !chunk.startsWith("[thounght]")
+                    ? parts[1].text + chunk
+                    : parts[1].text,
+                },
+              ],
+            };
+            return newConversation;
+          });
+        }
+        return response;
+      } else {
+        setConversation((prev) => [
+          ...prev,
+          { role: "model", parts: [{ text: "" }] },
+        ]);
+        const response = await handleChatStreaming(conversation, isThinking);
+        for await (const chunk of response) {
+          setConversation((prev) => {
+            const newConversation = [...prev];
+            const lastIndex = newConversation.length - 1;
+
+            newConversation[lastIndex] = {
+              ...newConversation[lastIndex],
+              parts: [
+                { text: newConversation[lastIndex].parts[0].text + chunk },
+              ],
+            };
+            return newConversation;
+          });
+        }
+        return response;
       }
     },
-    // onSuccess: (response) => {
-    //   let parts: {
-    //     text: string;
-    //     thought?: boolean;
-    //   }[] = [];
-
-    //   if (response?.thought !== "") {
-    //     parts = [
-    //       ...parts,
-    //       { thought: true, text: response?.thought || "Terjadi Kesalahan" },
-    //     ];
-    //   }
-    //   const botMessage = {
-    //     role: "model",
-    //     parts: [...parts, { text: response?.answer || "Terjadi Kesalahan" }],
-    //   };
-    //   setConversation((prev) => [...prev, botMessage]);
-    // },
-    // onError: (error) => {
-    //   const botMessage = {
-    //     role: "model",
-    //     parts: [{ text: "Terjadi Kesalahan" + error.message }],
-    //   };
-    //   setConversation((prev) => [...prev, botMessage]);
-    // },
+    onError: (error) => {
+      const botMessage = {
+        role: "model",
+        parts: [{ text: "Terjadi Kesalahan" + error.message }],
+      };
+      setConversation((prev) => [...prev, botMessage]);
+    },
   });
 
   function sendMessage(message: string) {
@@ -131,7 +145,7 @@ export default function ChatbotDrawer() {
       parts: [{ text: message }],
     };
     setConversation((prev) => [...prev, newMessage]);
-    handleChatMutation({ message, isThinking });
+    handleChatMutation({ isThinking });
   }
 
   useEffect(() => {

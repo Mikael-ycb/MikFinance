@@ -44,12 +44,15 @@ export async function handleChat(message: string, isThinking: boolean) {
 }
 
 export async function* handleChatStreaming(
-  message: string,
+  conversation: {
+    role: string;
+    parts: { text: string; thounght?: boolean }[];
+  }[],
   isThinking: boolean,
 ) {
   const response = await ai.models.generateContentStream({
     model: "gemini-3-flash-preview",
-    contents: message,
+    contents: [...conversation],
     config: {
       thinkingConfig: {
         includeThoughts: isThinking,

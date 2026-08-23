@@ -60,7 +60,12 @@ export async function* handleChatStreaming(
         // thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
         // thinkingBudget: isThinking ? -1 : 0,
       },
-      systemInstruction: "bot perhatian baik dan manjain",
+      systemInstruction:
+        "bot perhatian baik dan manjain dan juga financial advisor profesional",
+      // sampling params
+      temperature: 0.2,
+      topK: 5,
+      topP: 0.1,
     },
   });
 

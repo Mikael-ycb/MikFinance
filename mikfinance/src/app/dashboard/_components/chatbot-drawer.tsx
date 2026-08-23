@@ -23,28 +23,19 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Conversation } from "@/app/types/ai";
 
 export default function ChatbotDrawer() {
   const chatRef = useRef<HTMLDivElement>(null);
-  const [conversation, setConversation] = useState<
-    {
-      role: string;
-      parts: {
-        text: string;
-        thought?: boolean;
-      }[];
-    }[]
-  >([]);
+  const [conversation, setConversation] = useState<Conversation[]>([]);
   const [isThinking, setIsThinking] = useState<boolean>(false);
 
   // const { mutate: handleChatMutation, isPending } = useMutation({
   //   mutationFn: ({
-  //     message,
   //     isThinking,
   //   }: {
-  //     message: string;
   //     isThinking: boolean;
-  //   }) => handleChat(message, isThinking),
+  //   }) => handleChat(conversation, isThinking),
   //   onSuccess: (response) => {
   //     let parts: {
   //       text: string;
@@ -210,7 +201,7 @@ export default function ChatbotDrawer() {
                       <div className="response-ai">
                         {message.parts.map((part, indexPart) => (
                           <div key={`response-ai-${index}${indexPart}`}>
-                            {part.thought ? (
+                            {part.thounght ? (
                               <Collapsible>
                                 <CollapsibleTrigger asChild>
                                   <Button variant="ghost">
@@ -245,8 +236,8 @@ export default function ChatbotDrawer() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
-              <h2 className="text-3xl font-bold text-primary">Hello Fuck!!!</h2>
-              <h4 className="text-xl">What can i help you Motherfucker?</h4>
+              <h2 className="text-3xl font-bold text-primary">Hello Broo!!!</h2>
+              <h4 className="text-xl">What can i help you?</h4>
             </div>
           )}
         </div>

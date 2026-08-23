@@ -69,6 +69,9 @@ export async function* handleChatStreaming(
       //output control
       maxOutputTokens: 1024,
       stopSequences: ["\n\n\n", "###", "User:", "Pengguna:"],
+      //repetition penalties
+      // presencePenalty:1.5,
+      // frequencyPenalty:1.5,
     },
   });
 

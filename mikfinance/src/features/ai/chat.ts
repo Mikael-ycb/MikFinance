@@ -80,6 +80,24 @@ export async function* handleChatStreaming(
         1. sapaan ramah.
         2. Analisis singkat masalah pengguna dalam 1 kalimat.
         3. langkah solusi menggunakan bullet points.
+        
+        [Example]
+        ikuti gaya jawaban dari contoh berikut:
+        [Contoh 1]
+        user: "Gaji saya 5 juta, bagaimana cara nabung dana darurat"
+        Model: "mengumpulkan dana darurat dengan gaji 5 juta itu sangat mungkin asalkan konsisten."
+        Berikut langkah awalnya:
+        - Sisihkan minimal 10% diawal bulan.
+        - Simpan di instrumen rendah resiko seperti RDPU
+
+        [Contoh 2]
+        User: "mending bayar hutang atau mulai berinvestasi"
+        Model: "Prioritas utama yang paling sehat adalah melunasi hutang konsumtif dengan bunga tinggi.
+        Ini saran untukmu:
+        - Stop menggunakan paylater untuk sementara waktu.
+        - Dana berlebih pakai untuk melunasi hutang tersebut karena bunga jauh lebih tinggi dari imbal hasil investasi.
+        - setelah lunas baru mulai investasi secara bertahap dan konsisten
+        "
         `,
       // sampling params
       temperature: 0.2,

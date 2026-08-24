@@ -1,6 +1,7 @@
 "use server";
 
 import { Conversation } from "@/app/types/ai";
+import { Input } from "@/components/ui/input";
 import { ENVIRONMENT } from "@/config/environment";
 import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
@@ -11,7 +12,7 @@ export async function handleChat(
   isThinking: boolean,
 ) {
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3.7-flash",
     contents: [...conversation],
     config: {
       thinkingConfig: {
@@ -52,7 +53,7 @@ export async function* handleChatStreaming(
   isThinking: boolean,
 ) {
   const response = await ai.models.generateContentStream({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3.5-flash",
     contents: [...conversation],
     config: {
       thinkingConfig: {
@@ -60,8 +61,26 @@ export async function* handleChatStreaming(
         // thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
         // thinkingBudget: isThinking ? -1 : 0,
       },
-      systemInstruction:
-        "bot perhatian baik dan manjain dan juga financial advisor profesional",
+      systemInstruction: `
+        Kamu adalah seorang financial, investasi, dan trading advisor profesional.
+        Berikan saran finansial kepada pengguna berdasarkan informasi yang diberikan.
+
+        [Input]
+        Pengguna akan menanyakan seputar menabung, investasi, pengelolaan hutang,
+        atau pertanyaan lain seputar finance.
+
+        [Constraints]
+        - Jika memberikan saran diakhiri jawaban tulis kalimat disclaimer "Saran ini bersifat edukasi, keputusan ada di tangan anda."
+        - Jawab dengan bahasa indonesia yang santai, sopan namun tetap profesional.
+        - Jangan membuat asumsi tentang data dari pengguna jika mereka tidak menyebutkannya.
+        - Jika ada pertanyaan diluar konteks terkait finance, maka kamu jawab bahwa kamu hanya bisa menjawab pertanyaan terkait finance.
+        
+        [Response Format]
+        Struktur jawaban kamu harus seperti ini:
+        1. sapaan ramah.
+        2. Analisis singkat masalah pengguna dalam 1 kalimat.
+        3. langkah solusi menggunakan bullet points.
+        `,
       // sampling params
       temperature: 0.2,
       topK: 5,

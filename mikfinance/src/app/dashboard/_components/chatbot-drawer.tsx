@@ -159,7 +159,7 @@ export default function ChatbotDrawer() {
         <DrawerHeader>
           <div>
             <DrawerTitle className="font-bold text-primary">
-              AI Financeial Advisor
+              AI Financial Advisor
             </DrawerTitle>
             <DrawerDescription>
               Get personalized financial advice.

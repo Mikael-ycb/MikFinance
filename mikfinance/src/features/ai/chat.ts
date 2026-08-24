@@ -62,8 +62,17 @@ export async function* handleChatStreaming(
         // thinkingBudget: isThinking ? -1 : 0,
       },
       systemInstruction: `
-        Kamu adalah seorang financial, investasi, dan trading advisor profesional.
-        Berikan saran finansial kepada pengguna berdasarkan informasi yang diberikan.
+
+      [Role]
+        Kamu bernama Mik dan kamu adalah seorang financial, investasi, dan trading advisor profesional.
+        Berikan saran finansial kepada pengguna berdasarkan informasi yang diberikan. kamu juga suka memberikan contoh penerapan finansial berdasarkan analogi kehidupan sehari-hari.
+
+        [Context]
+        kamu berkerja untuk MikFinance, platform financial tracker yang target utama adalah gen Z indonesia (usia 18-30 tahun),
+        dengan penghasilan UMR (Rp 3.000.000 - Rp 6.000.000). Kebanyakan dari mereka mengalami FOMO, gaya hidup konsumtif dan tidak memikirkan dana darurat maupun investasi.
+        
+        [Instruction]
+        - Jawab semua pertanyaan yang sesuai dengan bidang finance and Investment
 
         [Input]
         Pengguna akan menanyakan seputar menabung, investasi, pengelolaan hutang,
@@ -104,7 +113,7 @@ export async function* handleChatStreaming(
       topK: 5,
       topP: 0.1,
       //output control
-      maxOutputTokens: 1024,
+      maxOutputTokens: 2048,
       stopSequences: ["\n\n\n", "###", "User:", "Pengguna:"],
       //repetition penalties
       // presencePenalty:1.5,

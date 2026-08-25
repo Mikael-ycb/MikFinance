@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Toggle } from "@/components/ui/toggle";
+import { handleWizardInput } from "@/features/ai/chat";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BrainIcon, SendIcon, SparklesIcon } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { BrainIcon, Loader2Icon, SendIcon, SparklesIcon } from "lucide-react";
 import { Dispatch, KeyboardEvent, SetStateAction } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
@@ -23,8 +25,19 @@ export default function WizardInput() {
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: handleWizardInput,
+    onSuccess: (response) => {
+      console.log(response);
+      form.reset();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   function onSubmit(data: z.infer<typeof formScema>) {
-    form.reset();
+    mutate(data.message);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -36,10 +49,10 @@ export default function WizardInput() {
 
   return (
     <Card className="w-full border-primary/20 p-0">
-      <CardContent className="">
+      <CardContent className="pr-2">
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col p-2 bg-secondary rounded-2xl"
+          className="flex items-center gap-2"
         >
           <div className="text-primary">
             <SparklesIcon className="size-5" />
@@ -47,21 +60,31 @@ export default function WizardInput() {
           <Controller
             control={form.control}
             name="message"
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <Field>
                 <input
                   {...field}
                   id="form-message"
-                  placeholder="Ask Mik AI here"
+                  placeholder="Write your Transaction here"
                   autoComplete="off"
                   className="h-14 focus:outline-none"
                   onKeyDown={handleKeyDown}
+                  disabled={isPending}
                 />
               </Field>
             )}
           />
-          <Button type="submit" size="icon" variant="ghost">
-            <SendIcon className="size-5" />
+          <Button
+            type="submit"
+            size="icon"
+            variant="ghost"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <Loader2Icon className="size-5 animat-spin" />
+            ) : (
+              <SendIcon className="size-5" />
+            )}
           </Button>
         </form>
       </CardContent>

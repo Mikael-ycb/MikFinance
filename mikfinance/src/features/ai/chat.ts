@@ -158,11 +158,32 @@ const transactionSchema = z.object({
     .describe("Category of Transaction"),
 
   description: z.string().describe("Short text for describing transaction"),
-  date: z.string().describe("the date in YYY-MM-DD"),
+  date: z.string().describe("the date of transaction in YYY-MM-DD"),
 });
 
 export async function handleWizardInput(message: string) {
-  const contents = `${message}`;
+  const contents = `
+  <role>
+    You are an AI Wizard finance assistant, who can extract transaction details from text.
+  </role>
+  <instruction>
+  Extract the transaction detail from the following text and return it as a structure JSON object.
+  The JSON object must have exactly these fields:
+  - "amount": a number representing the cost (positive). Use 0 if not provided.
+  - "type": type of transaction, either 'income' or 'expense'.
+  - "category": chose the most appropriate category from this exact list:
+          "Food & Drink", "Transport", "Reword", "Salary", "Invest", "Others".
+  - "description" : a short string descripting the transaction, first letter capitalized.
+  - "date": date of transaction in YYY-MM-DD format.
+            Assume the current date if relative term like 'today' or 'just now'. If not define use current date.
+  </transaction>
+  <context>
+    Current Date:  ${new Date().toISOString()}
+  </context>
+  <input>
+      Text to extract: ${message}
+  </input>
+  ${message}`;
   const ai = createAI();
   const response = await ai.models.generateContent({
     model: "gemini-3.7-flash",
@@ -173,5 +194,7 @@ export async function handleWizardInput(message: string) {
     },
   });
 
-  return response.text;
+  //const transaction = transactionSchema.parse();
+
+  return JSON.parse(`${response.text}`);
 }

@@ -52,7 +52,7 @@ export async function* handleChatStreaming(
 ) {
   const ai = createAI();
   const response = await ai.models.generateContentStream({
-    model: "gemini-3.7-flash",
+    model: "gemini-3.5-flash",
     contents: [...conversation],
     config: {
       thinkingConfig: {
@@ -176,13 +176,16 @@ export async function handleWizardInput(message: string) {
   - "description" : a short string descripting the transaction, first letter capitalized.
   - "date": date of transaction in YYY-MM-DD format.
             Assume the current date if relative term like 'today' or 'just now'. If not define use current date.
-  </transaction>
+  </instruction>
   <context>
     Current Date:  ${new Date().toISOString()}
   </context>
   <input>
       Text to extract: ${message}
   </input>
+  <outputFormat>
+    Respond with only the raw JSON object, no markdown clocks, no text before or after.
+  </outputFormat>
   ${message}`;
   const ai = createAI();
   const response = await ai.models.generateContent({
@@ -194,7 +197,9 @@ export async function handleWizardInput(message: string) {
     },
   });
 
-  //const transaction = transactionSchema.parse();
-
-  return JSON.parse(`${response.text}`);
+  const transaction = transactionSchema.parse(JSON.parse(`${response.text}`));
+  if (transaction.amount <= 0) {
+    throw new Error("Cannot create transaction with invalid amount");
+  }
+  return transaction;
 }

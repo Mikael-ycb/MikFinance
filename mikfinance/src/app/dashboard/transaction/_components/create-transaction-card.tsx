@@ -150,7 +150,8 @@ export default function CreateTransactionCard({
                         <SelectItem value="Transport">Transport</SelectItem>
                         <SelectItem value="Reword">Reword</SelectItem>
                         <SelectItem value="Salary">Salary</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="Invest">Invest</SelectItem>
+                        <SelectItem value="Others">Others</SelectItem>
                       </SelectContent>
                     </SelectTrigger>
                   </Select>

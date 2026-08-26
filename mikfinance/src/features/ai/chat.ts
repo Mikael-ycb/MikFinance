@@ -2,6 +2,7 @@
 
 import { Conversation } from "@/app/types/ai";
 import { createAI } from "./instance";
+import z from "zod";
 
 export async function handleChat(
   conversation: Conversation[],
@@ -148,6 +149,17 @@ export async function* handleChatStreaming(
     }
   }
 }
+
+const transactionSchema = z.object({
+  amount: z.number().default(0).describe("Transaction nominal"),
+  type: z.enum(["income", "expense"]).describe("Type of transaction"),
+  category: z
+    .enum(["Food & Drink", "Transport", "Reword", "Salary", "Invest", "Others"])
+    .describe("Category of Transaction"),
+
+  description: z.string().describe("Short text for describing transaction"),
+  date: z.string().describe("the date in YYY-MM-DD"),
+});
 
 export async function handleWizardInput(message: string) {
   const contents = `${message}`;

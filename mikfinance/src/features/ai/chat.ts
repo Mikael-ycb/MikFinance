@@ -167,7 +167,10 @@ export async function handleWizardInput(message: string) {
   const response = await ai.models.generateContent({
     model: "gemini-3.7-flash",
     contents,
-    config: {},
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: z.toJSONSchema(transactionSchema),
+    },
   });
 
   return response.text;

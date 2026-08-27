@@ -19,7 +19,7 @@ const formScema = z.object({
   message: z.string().min(1, "Message is required"),
 });
 
-export default function WizardInput() {
+export default function WizardInput({ refetch }: { refetch: () => void }) {
   const form = useForm<z.infer<typeof formScema>>({
     resolver: zodResolver(formScema),
     defaultValues: {
@@ -39,10 +39,15 @@ export default function WizardInput() {
     },
     onSuccess: (response) => {
       toast.success("Transaction created successfully!");
+      refetch();
       form.reset();
     },
     onError: (error) => {
-      console.log(error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to process your request",
+      );
     },
   });
 

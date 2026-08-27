@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardDescription,
@@ -7,17 +5,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getBalanceSummary } from "@/features/transaction/action";
 import { convertToIDR } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
 
-export function BalanceCards() {
-  const { data, error } = useQuery({
-    queryKey: ["balance"],
-    queryFn: () => getBalanceSummary(),
-  });
-
+export function BalanceCards({
+  data,
+  error,
+}: {
+  data:
+    | { savings: number; totalIncome: number; totalExpense: number }
+    | undefined;
+  error: unknown;
+}) {
   if (error) {
     return (
       <div className="w-full p-4 text-sm border rounded-lg border-destructive/50 text-destructive bg-destructive/10">

@@ -34,7 +34,7 @@ export function BalanceCards() {
             <WalletIcon className="size-4" />
             Saving
           </CardTitle>
-          <CardDescription className="text-2xl font-semibold text-secondary-foreground">
+          <CardDescription className="text-lg lg:text-2xl font-semibold text-secondary-foreground">
             {convertToIDR(Number(data?.savings || 0))}
           </CardDescription>
         </CardHeader>
@@ -47,7 +47,7 @@ export function BalanceCards() {
             <TrendingUpIcon className="size-4" />
             Income
           </CardTitle>
-          <CardDescription className="text-2xl font-semibold text-secondary-foreground">
+          <CardDescription className="text-lg lg:text-2xl font-semibold text-secondary-foreground">
             {convertToIDR(Number(data?.totalIncome || 0))}
           </CardDescription>
         </CardHeader>
@@ -60,7 +60,7 @@ export function BalanceCards() {
             <TrendingDownIcon className="size-4" />
             Expenses
           </CardTitle>
-          <CardDescription className="text-2xl font-semibold text-secondary-foreground">
+          <CardDescription className="text-lg lg:text-2xl font-semibold text-secondary-foreground">
             {convertToIDR(Number(data?.totalExpense || 0))}
           </CardDescription>
         </CardHeader>

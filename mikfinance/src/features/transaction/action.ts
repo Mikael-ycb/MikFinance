@@ -85,6 +85,7 @@ export async function createTransaction(
   const payload: Record<string, unknown> = { ...transaction };
   const embeddingVector = await handleEmbedding(transaction);
   if (embeddingVector) payload.embedding = embeddingVector;
+
   const { data, error } = await supabase.from("transactions").insert(payload);
 
   if (error) throw new Error(error.message);
@@ -105,9 +106,13 @@ export async function deleteTransaction(id: string) {
 
 export async function updateTransaction(
   id: string,
-  payload: Omit<Transaction, "id" | "user_id" | "embedding">,
+  transaction: Omit<Transaction, "id" | "user_id" | "embedding">,
 ) {
   const supabase = await createClient();
+  const payload: Record<string, unknown> = { ...transaction };
+  const embeddingVector = await handleEmbedding(transaction);
+  if (embeddingVector) payload.embedding = embeddingVector;
+
   const { data, error } = await supabase
     .from("transactions")
     .update(payload)

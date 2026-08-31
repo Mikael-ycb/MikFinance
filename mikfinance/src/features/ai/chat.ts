@@ -3,6 +3,9 @@
 import { Conversation } from "@/app/types/ai";
 import { createAI } from "./instance";
 import z from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { generateEmbedding } from "./embedding";
+import { Transaction } from "@/app/types/transaction";
 
 export async function handleChat(
   conversation: Conversation[],
@@ -148,6 +151,50 @@ export async function* handleChatStreaming(
       }
     }
   }
+}
+
+export async function handleChatPersonalizedStreaming(
+  query: string,
+  historyChat?: Conversation[],
+  isThinking?: boolean,
+) {
+  const ai = createAI();
+
+  const supabase = await createClient();
+
+  const queryEmbedding = await generateEmbedding(query);
+
+  const { data, error } = await supabase.rpc("match_transaction", {
+    query_embedding: queryEmbedding,
+    match_threshold: 0.3,
+    match_count: 15,
+  });
+
+  if (error) {
+    throw new Error("Failed to perform vector search.");
+  }
+
+  let contextData = "";
+
+  if (!data || data.length === 0) {
+    contextData =
+      "No Transactions found that are similar or relevant to the question";
+  } else {
+    contextData = data
+      .map((transaction: Transaction) => {
+        return JSON.stringify(transaction);
+      })
+      .join("\n");
+  }
+
+  const contents = `
+<role>
+  You are an AI Financial Advisor.
+
+  You are helping the user analyze their finance data using
+  the RAG (Retrieval-Augmented Generation) technique.
+</role>
+`;
 }
 
 const transactionSchema = z.object({

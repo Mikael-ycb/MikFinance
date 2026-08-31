@@ -49,10 +49,7 @@ export async function handleChat(
   return result;
 }
 
-export async function* handleChatStreaming(
-  conversation: Conversation[],
-  isThinking: boolean,
-) {
+async function generalChat(conversation: Conversation[], isThinking?: boolean) {
   const ai = createAI();
   const response = await ai.models.generateContentStream({
     model: "gemini-3.5-flash",
@@ -129,31 +126,10 @@ export async function* handleChatStreaming(
     },
   });
 
-  if (isThinking) {
-    for await (const chunk of response) {
-      const parts = chunk.candidates?.[0]?.content?.parts;
-      if (parts) {
-        for (const part of parts) {
-          if (!part.text) {
-            continue;
-          } else if (part.thought) {
-            yield `[thounght]${part.text}`;
-          } else {
-            yield part.text;
-          }
-        }
-      }
-    }
-  } else {
-    for await (const chunk of response) {
-      if (chunk.text) {
-        yield chunk.text;
-      }
-    }
-  }
+  return response;
 }
 
-export async function handleChatPersonalizedStreaming(
+async function personalizedChat(
   query: string,
   historyChat?: Conversation[],
   isThinking?: boolean,
@@ -224,6 +200,45 @@ ${contextData}
   });
 
   return response;
+}
+
+export async function* handleChatStreaming(
+  conversation: Conversation[],
+  isThinking: boolean,
+  mode: "general" | "personal",
+) {
+  let response;
+  if (mode === "general") {
+    response = await generalChat(conversation, isThinking);
+  } else {
+    response = await personalizedChat(
+      conversation[conversation.length - 1].parts[0].text,
+      conversation.slice(0, -1),
+      isThinking,
+    );
+  }
+  if (isThinking) {
+    for await (const chunk of response) {
+      const parts = chunk.candidates?.[0]?.content?.parts;
+      if (parts) {
+        for (const part of parts) {
+          if (!part.text) {
+            continue;
+          } else if (part.thought) {
+            yield `[thounght]${part.text}`;
+          } else {
+            yield part.text;
+          }
+        }
+      }
+    }
+  } else {
+    for await (const chunk of response) {
+      if (chunk.text) {
+        yield chunk.text;
+      }
+    }
+  }
 }
 
 const transactionSchema = z.object({

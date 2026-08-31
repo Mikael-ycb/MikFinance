@@ -187,14 +187,43 @@ export async function handleChatPersonalizedStreaming(
       .join("\n");
   }
 
-  const contents = `
+  const systemInstruction = `
 <role>
   You are an AI Financial Advisor.
 
   You are helping the user analyze their finance data using
   the RAG (Retrieval-Augmented Generation) technique.
 </role>
+<input>
+  User Question: "${query}"
+</input>
+<context>
+Relevant Transaction data from the database (Ordered from most relevant):
+${contextData}
+</context>
+<instruction>
+- Answer the user question ONLY based on the relevant transaction data above.
+- If there are calculations (total spending, average, etc), calculate them accurately based on data.
+- Provide the answer in a neat, professional, yet eazy-to-understand markdown format.
+- If there is no relevant data at all, state that data is not avaible in the history.
+</instruction>
+<constraints>
+- Don't answer in table format instead of markdown.
+</constraints>
 `;
+
+  const response = await ai.models.generateContentStream({
+    model: "gemini-3.7-flash",
+    contents: [...(historyChat ?? [])],
+    config: {
+      thinkingConfig: {
+        includeThoughts: isThinking,
+      },
+      systemInstruction,
+    },
+  });
+
+  return response;
 }
 
 const transactionSchema = z.object({

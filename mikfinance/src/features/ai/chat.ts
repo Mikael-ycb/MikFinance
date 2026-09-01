@@ -52,7 +52,7 @@ export async function handleChat(
 async function generalChat(conversation: Conversation[], isThinking?: boolean) {
   const ai = createAI();
   const response = await ai.models.generateContentStream({
-    model: "gemini-3.5-flash",
+    model: "gemini-3.6-flash",
     contents: [...conversation],
     config: {
       thinkingConfig: {
@@ -140,14 +140,15 @@ async function personalizedChat(
 
   const queryEmbedding = await generateEmbedding(query);
 
-  const { data, error } = await supabase.rpc("match_transaction", {
+  const { data, error } = await supabase.rpc("match_transactions", {
     query_embedding: queryEmbedding,
     match_threshold: 0.3,
     match_count: 15,
   });
 
   if (error) {
-    throw new Error("Failed to perform vector search.");
+    console.error("Vector search error:", error);
+    throw new Error(`Vector search failed: ${error.message}`);
   }
 
   let contextData = "";
@@ -163,7 +164,7 @@ async function personalizedChat(
       .join("\n");
   }
 
-  const systemInstruction = `
+  const prompt = `
 <role>
   You are an AI Financial Advisor.
 
@@ -182,6 +183,7 @@ ${contextData}
 - If there are calculations (total spending, average, etc), calculate them accurately based on data.
 - Provide the answer in a neat, professional, yet eazy-to-understand markdown format.
 - If there is no relevant data at all, state that data is not avaible in the history.
+- If user question is general and not need a data, response generally.
 </instruction>
 <constraints>
 - Don't answer in table format instead of markdown.
@@ -189,13 +191,15 @@ ${contextData}
 `;
 
   const response = await ai.models.generateContentStream({
-    model: "gemini-3.7-flash",
-    contents: [...(historyChat ?? [])],
+    model: "gemini-3.6-flash",
+    contents: [
+      ...(historyChat ?? []),
+      { role: "user", parts: [{ text: prompt }] },
+    ],
     config: {
       thinkingConfig: {
         includeThoughts: isThinking,
       },
-      systemInstruction,
     },
   });
 
@@ -249,7 +253,7 @@ const transactionSchema = z.object({
     .describe("Category of Transaction"),
 
   description: z.string().describe("Short text for describing transaction"),
-  date: z.string().describe("the date of transaction in YYY-MM-DD"),
+  date: z.string().describe("the date of transaction in YYYY-MM-DD"),
 });
 
 export async function handleWizardInput(message: string) {

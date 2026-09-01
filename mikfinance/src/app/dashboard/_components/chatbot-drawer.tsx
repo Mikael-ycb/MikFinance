@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { handleChat, handleChatStreaming } from "@/features/ai/chat";
+import { handleChatStreaming } from "@/features/ai/chat";
 import { BotIcon, ChevronDownIcon, EllipsisIcon, XIcon } from "lucide-react";
 import {
   Drawer,
@@ -70,7 +70,11 @@ export default function ChatbotDrawer() {
           ...prev,
           { role: "model", parts: [{ thought: true, text: "" }, { text: "" }] },
         ]);
-        const response = await handleChatStreaming(conversation, isThinking);
+        const response = await handleChatStreaming(
+          conversation,
+          isThinking,
+          "personal",
+        );
         for await (const chunk of response) {
           setConversation((prev) => {
             const newConversation = [...prev];
@@ -103,7 +107,11 @@ export default function ChatbotDrawer() {
           ...prev,
           { role: "model", parts: [{ text: "" }] },
         ]);
-        const response = await handleChatStreaming(conversation, isThinking);
+        const response = await handleChatStreaming(
+          conversation,
+          isThinking,
+          "personal",
+        );
         for await (const chunk of response) {
           setConversation((prev) => {
             const newConversation = [...prev];

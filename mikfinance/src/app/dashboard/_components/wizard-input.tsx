@@ -3,9 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
-import { handleWizardInput } from "@/features/ai/chat";
-import { generateEmbedding } from "@/features/ai/embedding";
-import { createTransaction } from "@/features/transaction/action";
+import { handleWizardInput } from "@/features/ai/wizard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon, SendIcon, SparklesIcon } from "lucide-react";

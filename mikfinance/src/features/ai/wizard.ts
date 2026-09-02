@@ -1,5 +1,6 @@
 import z from "zod";
 import { createAI } from "./instance";
+import { FunctionDeclaration, Type } from "@google/genai";
 
 const transactionSchema = z.object({
   amount: z.number().default(0).describe("Transaction nominal"),
@@ -54,3 +55,44 @@ export async function handleWizardInput(message: string) {
   }
   return transaction;
 }
+
+const createTransactionDeclaration: FunctionDeclaration = {
+  name: "create_transaction",
+  description:
+    "Create a new transaction in the user's financial history based on the provided details.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      amount: {
+        type: Type.STRING,
+        description: "The amounth of the transaction",
+      },
+      type: {
+        type: Type.STRING,
+        enum: ["income", "expense"],
+        description: "The type the transaction, either  'income' or 'expense'",
+      },
+      category: {
+        type: Type.STRING,
+        enum: [
+          "Food & Drink",
+          "Transport",
+          "Reword",
+          "Salary",
+          "Invest",
+          "Others",
+        ],
+        description: "The Category of the transaction",
+      },
+      description: {
+        type: Type.STRING,
+        description: "A brief description of the transaction",
+      },
+      date: {
+        type: Type.STRING,
+        description: 'The date of the transaction in the format "YYYY-MM-DD"',
+      },
+    },
+    required: ["amount", "description", "type", "category", "date"],
+  },
+};

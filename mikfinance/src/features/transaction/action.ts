@@ -41,6 +41,11 @@ export async function getTransactions(params?: {
     .from("transactions")
     .select("id, amount, type, description, date, category", {
       count: "exact",
+    })
+
+    .order("date")
+    .order("created_at", {
+      ascending: true,
     });
 
   if (search) {

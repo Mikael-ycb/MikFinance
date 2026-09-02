@@ -91,7 +91,8 @@ const createTransactionDeclaration: FunctionDeclaration = {
       },
       description: {
         type: Type.STRING,
-        description: "A brief description of the transaction",
+        description:
+          "A brief description of the transaction, first letter capitalized",
       },
       date: {
         type: Type.STRING,

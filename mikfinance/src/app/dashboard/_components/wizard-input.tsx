@@ -27,14 +27,7 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (message: string) => {
-      const aiResponse = await handleWizardInput(message);
-
-      if (!aiResponse) {
-        throw new Error("Failed to process AI input");
-      }
-      return createTransaction(aiResponse);
-    },
+    mutationFn: handleWizardInput,
     onSuccess: () => {
       toast.success("Transaction created successfully!");
       refetch();

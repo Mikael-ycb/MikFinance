@@ -1,6 +1,9 @@
+"use server";
+
 import z from "zod";
 import { createAI } from "./instance";
 import { FunctionDeclaration, Type } from "@google/genai";
+import { createTransaction } from "../transaction/action";
 
 const transactionSchema = z.object({
   amount: z.number().default(0).describe("Transaction nominal"),
@@ -38,7 +41,7 @@ export async function handleWizardInput(message: string) {
   <outputFormat>
     Respond with only the raw JSON object, no markdown clocks, no text before or after.
   </outputFormat>
-  ${message}`;
+  `;
   const ai = createAI();
   const response = await ai.models.generateContent({
     model: "gemini-3.7-flash",
@@ -64,7 +67,7 @@ const createTransactionDeclaration: FunctionDeclaration = {
     type: Type.OBJECT,
     properties: {
       amount: {
-        type: Type.STRING,
+        type: Type.NUMBER,
         description: "The amounth of the transaction",
       },
       type: {
@@ -96,3 +99,53 @@ const createTransactionDeclaration: FunctionDeclaration = {
     required: ["amount", "description", "type", "category", "date"],
   },
 };
+
+export async function handleWizardTools(message: string) {
+  const contents = `
+  <role>
+    You are an AI Wizard finance assistant, who can extract transaction details from text.
+  </role>
+  <instruction>
+  Extract the transaction detail from the following text.
+  </instruction>
+  <context>
+    Current Date:  ${new Date().toISOString()}
+  </context>
+  <input>
+      Text to extract: ${message}
+  </input>`;
+
+  const ai = createAI();
+  const response = await ai.models.generateContent({
+    model: "gemini-3.5-flash",
+    contents,
+    config: {
+      tools: [
+        {
+          functionDeclarations: [createTransactionDeclaration],
+        },
+      ],
+    },
+  });
+
+  if (response.functionCalls && response.functionCalls.length > 0) {
+    const functionCall = response.functionCalls[0];
+    switch (functionCall.name) {
+      case "create_transaction":
+        const args = functionCall.args;
+        if (!args) {
+          throw new Error("No arguments provided for create transaction");
+        }
+        const transaction = transactionSchema.parse(args);
+        if (transaction.amount <= 0) {
+          throw new Error("Cannot create transaction with invalid amount");
+        }
+        await createTransaction(transaction);
+        break;
+      default:
+        throw new Error("Unknow function call");
+    }
+  } else {
+    throw new Error("AI did not call any function");
+  }
+}

@@ -1,5 +1,6 @@
 "use server";
 
+import { createClient } from "@/lib/supabase/server";
 import { createAI } from "./instance";
 
 export async function generateEmbedding(contents: string) {
@@ -25,4 +26,27 @@ export async function generateEmbedding(contents: string) {
   } catch (error) {
     throw error;
   }
+}
+
+export async function findEmbedding(
+  query: string,
+  match_threshold?: number,
+  match_count?: number,
+) {
+  const supabase = await createClient();
+
+  const queryEmbedding = await generateEmbedding(query);
+
+  const { data, error } = await supabase.rpc("match_transactions", {
+    query_embedding: queryEmbedding,
+    match_threshold: match_threshold || 0.3,
+    match_count: match_count || 15,
+  });
+
+  if (error) {
+    console.error("Vector search error:", error);
+    throw new Error(`Vector search failed: ${error.message}`);
+  }
+
+  return data;
 }

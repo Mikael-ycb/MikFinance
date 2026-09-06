@@ -3,7 +3,12 @@
 import z from "zod";
 import { createAI } from "./instance";
 import { FunctionDeclaration, Type } from "@google/genai";
-import { createTransaction } from "../transaction/action";
+import {
+  createTransaction,
+  deleteTransaction,
+  updateTransaction,
+} from "../transaction/action";
+import { findEmbedding } from "./embedding";
 
 const transactionSchema = z.object({
   amount: z.number().default(0).describe("Transaction nominal"),
@@ -112,6 +117,16 @@ const deleteTransactionDeclaration: FunctionDeclaration = {
   },
 };
 
+const updateTransactionDeclaration: FunctionDeclaration = {
+  name: "update_transaction",
+  description:
+    "update an existing transaction from user's financial history based on the provided data.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: transactionProperties,
+  },
+};
+
 export async function handleWizardTools(message: string) {
   const contents = `
   <role>
@@ -137,6 +152,7 @@ export async function handleWizardTools(message: string) {
           functionDeclarations: [
             createTransactionDeclaration,
             deleteTransactionDeclaration,
+            updateTransactionDeclaration,
           ],
         },
       ],
@@ -148,7 +164,7 @@ export async function handleWizardTools(message: string) {
       response.functionCalls.map(async (functionCall) => {
         const args = functionCall.args;
         if (!args) {
-          throw new Error("No arguments provided for create transaction");
+          throw new Error("No arguments provided for Action");
         }
         switch (functionCall.name) {
           case "create_transaction":
@@ -159,6 +175,28 @@ export async function handleWizardTools(message: string) {
             await createTransaction(transaction);
             break;
           case "delete_transaction":
+            const dataFindForDelete = await findEmbedding(
+              JSON.stringify(args),
+              0.3,
+              1,
+            );
+            const deletedData = dataFindForDelete[0];
+            await deleteTransaction(deletedData.id);
+            break;
+          case "update_transaction":
+            const dataFindForUpdate = await findEmbedding(
+              JSON.stringify(args),
+              0.3,
+              1,
+            );
+            const updateData = dataFindForUpdate[0];
+
+            const newData = transactionSchema.parse(args);
+            if (newData.amount <= 0) {
+              throw new Error("Cannot update transaction with invalid amount");
+            }
+
+            await updateTransaction(updateData.id, newData);
             break;
           default:
             throw new Error("Unknow function call");

@@ -29,7 +29,7 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
     mutationFn: handleWizardTools,
     onSuccess: (response) => {
       toast.success(
-        <div>
+        <div className="response-ai w-full!">
           <Markdown>{response}</Markdown>
         </div>,
       );

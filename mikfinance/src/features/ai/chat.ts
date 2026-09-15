@@ -211,10 +211,19 @@ export async function* handleChatStreaming(
 
     while (running) {
       const response = await ai.models.generateContentStream({
-        model: "gemini-3.6-flash",
+        model: "gemini-2.5-flash",
         contents,
         config: {
-          tools: [{ functionDeclarations: [getTransactionDeclaration] }],
+          tools: [
+            {
+              googleSearch: {},
+              urlContext: {},
+              functionDeclarations: [getTransactionDeclaration],
+            },
+          ],
+          toolConfig: {
+            includeServerSideToolInvocations: true,
+          },
           thinkingConfig: {
             includeThoughts: isThinking,
           },

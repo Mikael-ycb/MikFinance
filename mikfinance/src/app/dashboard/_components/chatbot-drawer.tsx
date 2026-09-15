@@ -205,7 +205,7 @@ export default function ChatbotDrawer() {
               ))}
 
               {isPending && (
-                <div className="flex items-center animate-pulse -mt-8">
+                <div className="flex items-center animate-pulse -mt-2">
                   <EllipsisIcon className="size-8 text-primary/50" />
                 </div>
               )}

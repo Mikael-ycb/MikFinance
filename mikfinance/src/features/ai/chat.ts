@@ -51,7 +51,7 @@ export async function handleChat(
 async function generalChat(conversation: Content[], isThinking?: boolean) {
   const ai = createAI();
   const response = await ai.models.generateContentStream({
-    model: "gemini-3.7-flash",
+    model: "gemini-2.5-flash",
     contents: [...conversation],
     config: {
       thinkingConfig: {
@@ -59,6 +59,12 @@ async function generalChat(conversation: Content[], isThinking?: boolean) {
         // thinkingLevel: isThinking ? ThinkingLevel.HIGH : ThinkingLevel.MINIMAL,
         // thinkingBudget: isThinking ? -1 : 0,
       },
+      tools: [
+        {
+          googleSearch: {},
+        },
+      ],
+
       systemInstruction: `
 
       [Role]
@@ -81,7 +87,7 @@ async function generalChat(conversation: Content[], isThinking?: boolean) {
         - Jangan membuat asumsi tentang data dari pengguna jika mereka tidak menyebutkannya.
         - Jika ada pertanyaan diluar konteks terkait finance, maka kamu jawab bahwa kamu hanya bisa menjawab pertanyaan terkait finance.
         
-        [WOrkflow Steps]
+        [Workflow Steps]
         - Langkah 1 (Information Extraction): identifikasi pengguna, tanyakan usia, peghasilan/buget, tujuan keuangannya
         - Langkah 2 (Thounght): analisis masalah utama pengguna dan data apa yang kurang.
         - Langkah 3 (Action): tentukan rencana yang harus dijalankan
@@ -163,7 +169,7 @@ export async function* handleChatStreaming(
 
     const ai = createAI();
 
-    let contents: Content[] = [
+    const contents: Content[] = [
       ...historyChat,
       {
         role: "user",

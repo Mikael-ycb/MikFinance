@@ -3,6 +3,8 @@
 import { Transaction } from "@/app/types/transaction";
 import { findEmbedding } from "./embedding";
 import { createAI } from "./instance";
+import { ChartArea } from "lucide-react";
+import { Type } from "@google/genai";
 
 export async function generateChart(request: string) {
   const ai = createAI();
@@ -27,31 +29,66 @@ export async function generateChart(request: string) {
       {
         text: `
             <role>
-            You are an AI Financial Advisor and data engineering specialist. Your task is to analyze transaction in <context> and generatea structured JSON configuration to render charts that derectly response the user's request.
+            You are an AI Financial Advisor and data engineering specialist.
+             Your task is to analyze transaction in <context> and generatea structured 
+             JSON configuration to render charts that derectly response the user's request.
             </role>
             <input>
-            User Question: "${query}"
+            User request: "${request}"
             </input>
             <instruction>
-            - Extract the transaction details from the input.
-            - Answer the user question ONLY based on the relevant transaction data (if there's need data).
-            - If there are calculations (total spending, average, etc), calculate them accurately based on data.
-            - Provide the answer in a neat, professional, yet eazy-to-understand markdown format.
-            - If there is no relevant data at all, state that data is not avaible in the history.
-            - If user question is general and not need a data, response generally.
-            - The final response if there are no more functions being called is as simple as possible.
+            1. Analyze and filter: read the user's request and extract only the relevante transaction from the provided <context>.
+            2. Grouping & Summarization: 
+                - If the query is about expense type, group by category name.
+                - If it's about time trend, group by date, day, or month.
+                - If it's comparing income and expanses, group by type.
+                - Limit the data to the top 10 most significant groups to ensure the chart is clean on the dashboard, Group smaller items into "Others" if necessary.
+            3. Values & Calculations: ensure values are aggregated correctly. Use positive number for visual chart representation. 
+            4. Chart Type Selection: 
+                - Use 'chartType: "pie"' if the users asks for proportions, ratios, percentages, or category composition.
+                - Use 'chartType: "bar"' if the user asks for comparations, over-time trends, chronologcal analysis, or comparing indivisual entities.
             </instruction>
             <context>
             Current Date : ${new Date().toISOString()}
+            Data transaction: ${contextData}
             </context>
             <constraints>
-            - Answer in relaxed, polite but professional in Indonesia.
-            - Don't make assumptions about data from users if they don't mention it.
-            - If there are quetions outside the context related to finance, you most only answer questions related to finance.
-            - Don't answer in table format instead of markdown.
+            - Respond stricly with a raw and valid JSON object matching the requested schema.
+            - Do NOT include markdown code blocks, backticks, or any conversational text.
             </constraints>
             `,
       },
     ],
   };
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3.5-flash",
+    contents,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          ChartType: {
+            type: Type.STRING,
+            enum: ["bar", "pie"],
+            description: "Chart type to render",
+          },
+          data: {
+            type: Type.ARRAY,
+            description: "Array of object for data chart",
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                value: { type: Type.NUMBER },
+              },
+              required: ["name", "value"],
+            },
+          },
+        },
+        required: ["chartType", "data"],
+      },
+    },
+  });
 }

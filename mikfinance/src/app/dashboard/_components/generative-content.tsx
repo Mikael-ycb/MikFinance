@@ -1,7 +1,9 @@
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateChart } from "@/features/ai/generative-content";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { SparklesIcon } from "lucide-react";
+import { KeyboardEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -60,4 +62,28 @@ export default function GenerativeContent() {
       );
     },
   });
+
+  function onSummit(data: z.infer<typeof formSchema>) {
+    mutate(data.request);
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSummit(form.getValues());
+    }
+  }
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <SparklesIcon className="size-5 text-primary" />
+            Generative AI Insight
+          </CardTitle>
+        </div>
+      </CardHeader>
+    </Card>
+  );
 }

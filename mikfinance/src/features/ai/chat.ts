@@ -4,7 +4,7 @@ import { Conversation } from "@/app/types/ai";
 import { createAI } from "./instance";
 import { findEmbedding } from "./embedding";
 import { Content, FunctionCall, Part } from "@google/genai";
-import { getTransactionDeclaration } from "./functionTransaction";
+import { getTransactionDeclaration } from "./function-transaction";
 
 export async function handleChat(
   conversation: Conversation[],
@@ -216,14 +216,14 @@ export async function* handleChatStreaming(
         config: {
           tools: [
             {
-              googleSearch: {},
-              urlContext: {},
+              // googleSearch: {},
+              // urlContext: {},
               functionDeclarations: [getTransactionDeclaration],
             },
           ],
-          toolConfig: {
-            includeServerSideToolInvocations: true,
-          },
+          // toolConfig: {
+          //   includeServerSideToolInvocations: true,
+          // },
           thinkingConfig: {
             includeThoughts: isThinking,
           },

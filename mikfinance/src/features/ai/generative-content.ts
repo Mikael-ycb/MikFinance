@@ -3,7 +3,6 @@
 import { Transaction } from "@/app/types/transaction";
 import { findEmbedding } from "./embedding";
 import { createAI } from "./instance";
-import { ChartArea } from "lucide-react";
 import { Type } from "@google/genai";
 
 export async function generateChart(request: string) {
@@ -91,4 +90,12 @@ export async function generateChart(request: string) {
       },
     },
   });
+
+  if (!response.text) {
+    throw new Error("Fieled to generate chart");
+  }
+
+  const cahrtData = JSON.parse(response.text);
+
+  return cahrtData;
 }

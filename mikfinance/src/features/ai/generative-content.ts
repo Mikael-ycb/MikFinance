@@ -11,7 +11,7 @@ export async function generateChart(request: string) {
   const data = await findEmbedding(request, 0.5, 50);
 
   let contextData = "";
-  if (!data || data.lenght === 0) {
+  if (!data || data.length === 0) {
     contextData =
       "No transaction found that are simmilar or relevant to the request";
   } else {
@@ -29,7 +29,7 @@ export async function generateChart(request: string) {
         text: `
             <role>
             You are an AI Financial Advisor and data engineering specialist.
-             Your task is to analyze transaction in <context> and generatea structured 
+             Your task is to analyze transaction in <context> and generate structured 
              JSON configuration to render charts that derectly response the user's request.
             </role>
             <input>
@@ -68,7 +68,7 @@ export async function generateChart(request: string) {
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          ChartType: {
+          chartType: {
             type: Type.STRING,
             enum: ["bar", "pie"],
             description: "Chart type to render",
@@ -95,7 +95,7 @@ export async function generateChart(request: string) {
     throw new Error("Fieled to generate chart");
   }
 
-  const cahrtData = JSON.parse(response.text);
+  const chartData = JSON.parse(response.text);
 
-  return cahrtData;
+  return chartData;
 }

@@ -4,12 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { generateChart } from "@/features/ai/generative-content";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import {
   ChartPieIcon,
-  Files,
   Loader2Icon,
   Sparkles,
   SparklesIcon,
@@ -18,6 +16,19 @@ import { KeyboardEvent, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import {
+  ResponsiveContainer,
+  XAxis,
+  BarChart,
+  PieChart,
+  YAxis,
+  Tooltip,
+  Bar,
+  Pie,
+  Sector,
+} from "recharts";
+import { convertToIDR } from "@/lib/utils";
+import { text } from "stream/consumers";
 
 const formSchema = z.object({
   request: z.string().min(1, "Request is required"),
@@ -85,8 +96,13 @@ export default function GenerativeContent() {
     }
   }
 
+  console.log("RESULT:", result);
+  console.log("CHART TYPE:", result?.chartType);
+  console.log("TYPE:", typeof result?.chartType);
+  console.log("IS BAR:", result?.chartType === "bar");
+
   return (
-    <Card className="w-full">
+    <Card className="w-full relative overflow-hidden">
       <CardHeader>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <CardTitle className="text-xl flex items-center gap-2">
@@ -138,13 +154,13 @@ export default function GenerativeContent() {
           </form>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-75">
         {error && (
           <div className="text-sm text-destructive p-4 border-destructive/50 bg-destructive/10 rounded-lg">
             {error.message}
           </div>
         )}
-        {!result && (
+        {!result ? (
           <div className="h-70 flex items-center justify-center border-2 border-dashed rounded-lg">
             {isPending ? (
               <div>
@@ -155,6 +171,82 @@ export default function GenerativeContent() {
               <span className="text-muted-foreground/50 text-lg">
                 Generate insight content with AI
               </span>
+            )}
+          </div>
+        ) : (
+          <div className="h-full">
+            {result.type === "chart" && (
+              <ResponsiveContainer width="100%" height="100%">
+                {result.chartType === "bar" ? (
+                  <BarChart data={result.data}>
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) =>
+                        convertToIDR(Number(value) || 0)
+                      }
+                      style={{
+                        fontSize: "8px",
+                      }}
+                    />
+                    <Tooltip
+                      formatter={(value) => convertToIDR(Number(value) || 0)}
+                      contentStyle={{
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Bar
+                      dataKey="value"
+                      fill="var(--color-primary"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                ) : (
+                  <PieChart>
+                    <Pie
+                      data={result.data}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(props) => (
+                        <text
+                          x={props.x}
+                          y={props.y}
+                          fill={COLORS[props.index % COLORS.length]}
+                          textAnchor={props.textAnchor}
+                          dominantBaseline="central"
+                          fontSize={14}
+                        >
+                          {`${props.name} (${((props.percent || 0) * 100).toFixed(0)}%)`}
+                        </text>
+                      )}
+                      outerRadius={100}
+                      dataKey="value"
+                      shape={(props, index) => (
+                        <Sector
+                          {...props}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      )}
+                    />
+                    <Tooltip
+                      formatter={(value) => convertToIDR(Number(value) || 0)}
+                      contentStyle={{
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </PieChart>
+                )}
+              </ResponsiveContainer>
             )}
           </div>
         )}

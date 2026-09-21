@@ -1,10 +1,21 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { generateChart } from "@/features/ai/generative-content";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { SparklesIcon } from "lucide-react";
+import {
+  ChartPieIcon,
+  Files,
+  Loader2Icon,
+  Sparkles,
+  SparklesIcon,
+} from "lucide-react";
 import { KeyboardEvent, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -82,8 +93,72 @@ export default function GenerativeContent() {
             <SparklesIcon className="size-5 text-primary" />
             Generative AI Insight
           </CardTitle>
+          <form
+            className="flex flex-col lg:flex-row lg:items-center gap-2"
+            onSubmit={form.handleSubmit(onSummit)}
+          >
+            <ButtonGroup>
+              <Button
+                variant={insightType === "chart" ? "default" : "secondary"}
+                type="button"
+                size="icon"
+                onClick={() => setInsightType("chart")}
+              >
+                <ChartPieIcon />
+              </Button>
+            </ButtonGroup>
+            <div className="flex flex-row gap-2">
+              <Controller
+                control={form.control}
+                name="request"
+                render={({ field }) => (
+                  <Field>
+                    <Input
+                      {...field}
+                      id="form-request"
+                      placeholder="Insert your request..."
+                      className="w-50 lg:w-70"
+                      onKeyDown={handleKeyDown}
+                      disabled={isPending}
+                    />
+                  </Field>
+                )}
+              />
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  <Sparkles className="size-4" />
+                )}
+                <span className="hidden lg:inline">
+                  {result ? "Update" : "Generate"}
+                </span>
+              </Button>
+            </div>
+          </form>
         </div>
       </CardHeader>
+      <CardContent>
+        {error && (
+          <div className="text-sm text-destructive p-4 border-destructive/50 bg-destructive/10 rounded-lg">
+            {error.message}
+          </div>
+        )}
+        {!result && (
+          <div className="h-70 flex items-center justify-center border-2 border-dashed rounded-lg">
+            {isPending ? (
+              <div>
+                <Loader2Icon className="size-8 animate-spin" />
+                <span>AI is Generating insight</span>
+              </div>
+            ) : (
+              <span className="text-muted-foreground/50 text-lg">
+                Generate insight content with AI
+              </span>
+            )}
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 }

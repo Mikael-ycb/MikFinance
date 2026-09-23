@@ -31,6 +31,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createTransaction } from "@/features/transaction/action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import FileDropzoneInput from "../../_components/file-dropzone-input";
 
 const formScema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -90,6 +91,9 @@ export default function CreateTransactionCard({
         <CardDescription>Add a new financial activity.</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="md-4">
+          <FileDropzoneInput setValues={form.setValues} refetch={refetch} />
+        </div>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="gap-3">
             <Controller

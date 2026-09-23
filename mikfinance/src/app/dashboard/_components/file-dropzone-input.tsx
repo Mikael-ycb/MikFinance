@@ -20,7 +20,19 @@ export default function FileDropzoneInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div>
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragging(true);
+      }}
+      onDragLeave={() => setIsDragging(false)}
+      className={cn(
+        "border-2 border-dashed rounded-xl p-6 cursor-pointer transition-all",
+        isDragging
+          ? "border-primary bg-primary/10 scale-[1.02]"
+          : "border-muted hover:border-primary/50 hover:bg-muted/50",
+      )}
+    >
       <input type="file" ref={fileInputRef} className="hidden" />
       <div className="flex flex-col items-center">
         <UploadCloudIcon

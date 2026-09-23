@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { UploadCloudIcon } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, DragEvent } from "react";
 import { UseFormSetValues } from "react-hook-form";
 
 export default function FileDropzoneInput({
@@ -19,6 +19,14 @@ export default function FileDropzoneInput({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer?.files && e.dataTransfer?.files.length > 0) {
+      console.log(e.dataTransfer.files[0]);
+    }
+  };
+
   return (
     <div
       onDragOver={(e) => {
@@ -26,6 +34,8 @@ export default function FileDropzoneInput({
         setIsDragging(true);
       }}
       onDragLeave={() => setIsDragging(false)}
+      onClick={() => fileInputRef.current?.click()}
+      onDrop={handleDrop}
       className={cn(
         "border-2 border-dashed rounded-xl p-6 cursor-pointer transition-all",
         isDragging

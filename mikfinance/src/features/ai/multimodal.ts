@@ -1,9 +1,12 @@
+"use server";
+
 import {
   CATEGORIES,
   transactionSchema,
 } from "@/constants/transaction-constant";
 import { createAI } from "./instance";
 import { Content } from "@google/genai";
+import z from "zod";
 
 export async function extractReceiptData(formData: FormData) {
   const file = formData.get("file") as File;
@@ -20,27 +23,28 @@ export async function extractReceiptData(formData: FormData) {
       parts: [
         {
           text: `
-        <role>
-        You are an AI finance assistant who extracts transaction details from receipts.
-        </role>
+    <role>
+    You are an AI finance assistant who extracts transaction details from receipts.
+    </role>
 
-        <instruction>
-        Extract the transaction details from the receipt and return them as a JSON object.
+    <instruction>
+    Extract the transaction details from the receipt and return them as a JSON object.
 
-        The JSON object must contain exactly these fields:
+    The JSON object must contain exactly these fields:
 
-        - "amount": a positive number representing the transaction amount.
-        - "type": either "income" or "expense".
-        - "category": choose the most appropriate category from:
-        ${CATEGORIES.join(", ")}
-        - "description": a short description of the transaction with the first letter capitalized.
-        - "date": transaction date in YYYY-MM-DD format.
+    - "amount": a positive number representing the transaction amount.
+    - "type": either "income" or "expense".
+    - "category": choose the most appropriate category from:
+    ${CATEGORIES.join(", ")}
+    - "description": a short description of the transaction with the first letter capitalized.
+    - "date": transaction date in YYYY-MM-DD format.
+            Assume the current date if relative terms like 'today'
 
-        If the date cannot be found, use today's date.
+    If the date cannot be found, use today's date.
 
-        Current date:
-        ${new Date().toISOString()}
-        </instruction>
+    Current date:
+    ${new Date().toISOString()}
+    </instruction>
           `,
         },
         {
@@ -56,6 +60,10 @@ export async function extractReceiptData(formData: FormData) {
   const response = await ai.models.generateContent({
     model: "gemini-3.5-flash",
     contents,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: z.toJSONSchema(transactionSchema),
+    },
   });
 
   if (!response.text) {

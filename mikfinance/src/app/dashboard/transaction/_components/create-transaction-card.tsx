@@ -32,6 +32,7 @@ import { createTransaction } from "@/features/transaction/action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import FileDropzoneInput from "../../_components/file-dropzone-input";
+import { CATEGORIES } from "@/constants/transaction-constant";
 
 const formScema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -148,14 +149,11 @@ export default function CreateTransactionCard({
                     <SelectTrigger id="form-category">
                       <SelectValue placeholder="Select category" />
                       <SelectContent>
-                        <SelectItem value="Food & Drink">
-                          Food & Drink
-                        </SelectItem>
-                        <SelectItem value="Transport">Transport</SelectItem>
-                        <SelectItem value="Reword">Reword</SelectItem>
-                        <SelectItem value="Salary">Salary</SelectItem>
-                        <SelectItem value="Invest">Invest</SelectItem>
-                        <SelectItem value="Others">Others</SelectItem>
+                        {CATEGORIES.map((category) => (
+                          <SelectItem value={category} key={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </SelectTrigger>
                   </Select>
@@ -206,11 +204,7 @@ export default function CreateTransactionCard({
                 </Field>
               )}
             />
-            <Button
-              size="lg"
-              type="submit"
-              disabled={!form.formState.isValid || isPending}
-            >
+            <Button size="lg" type="submit" disabled={isPending}>
               {isPending ? "Creating..." : "Create Transaction"}
             </Button>
           </FieldGroup>

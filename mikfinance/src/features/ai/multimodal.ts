@@ -35,7 +35,7 @@ export async function extractReceiptData(formData: FormData) {
     - "amount": a positive number representing the transaction amount.
     - "type": either "income" or "expense".
     - "category": choose the most appropriate category from:
-    ${CATEGORIES.join(", ")}
+    ${CATEGORIES.join(", ")} 
     - "description": a short description of the transaction with the first letter capitalized.
     - "date": transaction date in YYYY-MM-DD format.
             Assume the current date if relative terms like 'today'

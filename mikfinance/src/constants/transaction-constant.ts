@@ -12,9 +12,7 @@ export const CATEGORIES = [
 export const transactionSchema = z.object({
   amount: z.number().default(0).describe("Transaction nominal"),
   type: z.enum(["income", "expense"]).describe("Type of transaction"),
-  category: z
-    .enum(["Food & Drink", "Transport", "Reword", "Salary", "Invest", "Others"])
-    .describe("Category of Transaction"),
+  category: z.enum(CATEGORIES).describe("Category of Transaction"),
 
   description: z.string().describe("Short text for describing transaction"),
   date: z.string().describe("the date of transaction in YYYY-MM-DD"),

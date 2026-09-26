@@ -15,7 +15,10 @@ import {
   getTransactionDeclaration,
   updateTransactionDeclaration,
 } from "./function-transaction";
-import { transactionSchema } from "@/constants/transaction-constant";
+import {
+  CATEGORIES,
+  transactionSchema,
+} from "@/constants/transaction-constant";
 
 export async function handleWizardInput(message: string) {
   const contents = `
@@ -28,7 +31,7 @@ export async function handleWizardInput(message: string) {
   - "amount": a number representing the cost (positive). Use 0 if not provided.
   - "type": type of transaction, either 'income' or 'expense'.
   - "category": chose the most appropriate category from this exact list:
-          "Food & Drink", "Transport", "Reword", "Salary", "Invest", "Others".
+          ${CATEGORIES.join(",")}
   - "description" : a short string descripting the transaction, first letter capitalized.
   - "date": date of transaction in YYY-MM-DD format.
             Assume the current date if relative term like 'today' or 'just now'. If not define use current date.

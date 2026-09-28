@@ -6,7 +6,13 @@ import { Field } from "@/components/ui/field";
 import { handleWizardTools } from "@/features/ai/wizard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2Icon, SendIcon, SparklesIcon } from "lucide-react";
+import {
+  Loader2Icon,
+  MicIcon,
+  SendIcon,
+  SparklesIcon,
+  SquareIcon,
+} from "lucide-react";
 import { KeyboardEvent, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
@@ -49,10 +55,11 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
   });
 
   function onSubmit(data: z.infer<typeof formScema>) {
-    mutate({
-      role: "user",
-      parts: [{ text: data.message }],
-    });
+    const formData = new FormData();
+    formData.append("type", "text");
+    formData.append("file", "");
+    formData.append("request", data.message);
+    mutate(formData);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -62,6 +69,41 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
     }
   }
 
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      const chunk: Blob[] = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunk.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(chunk, { type: "audio/webm" });
+        const formData = new FormData();
+        formData.append("type", "audio");
+        formData.append("request", "data.message");
+        formData.append("file", audioBlob);
+        mutate(formData);
+
+        stream.getTracks().forEach((t) => t.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch {
+      toast.error("Failed to access media recorder");
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
   return (
     <Card className="w-full border-primary/20 p-0">
       <CardContent className="pr-2">
@@ -90,15 +132,19 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
             )}
           />
           <Button
-            type="submit"
+            type={form.watch("message") !== "" ? "submit" : "button"}
             size="icon"
             variant="ghost"
             disabled={isPending}
           >
             {isPending ? (
               <Loader2Icon className="size-5 animat-spin" />
-            ) : (
+            ) : form.watch("message") !== "" ? (
               <SendIcon className="size-5" />
+            ) : isRecording ? (
+              <SquareIcon className="='text-red-500 size-5 animate-pulse" />
+            ) : (
+              <MicIcon className="size-5" />
             )}
           </Button>
         </form>

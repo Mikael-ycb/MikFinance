@@ -65,21 +65,44 @@ export async function handleWizardInput(message: string) {
   return "Create transaction success";
 }
 
-export async function handleWizardTools(content: Content) {
+export async function handleWizardTools(formData: FormData) {
+  const file = formData.get("file") as File;
+  const request = formData.get("request") as File;
+  const type = formData.get("type") as "audio" | "text";
+  if (type === "audio" && !file) {
+    throw new Error("No File Uploaded");
+  }
+
+  let mimeType = "";
+  let base64Data = "";
+
+  if (type === "audio") {
+    mimeType = file.type;
+    base64Data = Buffer.from(await file.arrayBuffer()).toString("base64");
+  }
+
   let contents: Content[] = [];
-  const isText = !!content?.parts?.[0]?.text;
 
   contents.push({
-    role: content.role,
+    role: "user",
     parts: [
-      ...(!isText && content?.parts?.[0] ? [content.parts[0]] : []),
+      ...(type === "audio"
+        ? [
+            {
+              inlineData: {
+                mimeType,
+                data: base64Data,
+              },
+            },
+          ]
+        : []),
       {
         text: `
   <role>
-    You are an AI Wizard finance assistant, who can extract transaction details from ${isText ? "text" : "audio"}.
+    You are an AI Wizard finance assistant, who can extract transaction details from ${type === "text" ? "text" : "audio"}.
   </role>
   <instruction>
-  - Extract the transaction detail from ${isText ? "the following text" : "the audio file"}.
+  - Extract the transaction detail from ${type === "text" ? "the following text" : "the audio file"}.
   - If request is to update or delete transaction, you must call function get_treansaction first to find out which transaction will be updated or deleted. 
   - When update transaction, args must return from get_transaction before with fully like in schema.
   - The final response if there are no more functions being called is as simple as possible.
@@ -88,9 +111,9 @@ export async function handleWizardTools(content: Content) {
     Current Date:  ${new Date().toISOString()}
   </context>
   ${
-    isText &&
+    type === "text" &&
     `<input>
-      Text to extract: ${content.parts?.[0]?.text}
+      Text to extract: ${request}
   </input>`
   }
   `,

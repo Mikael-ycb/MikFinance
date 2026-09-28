@@ -22,6 +22,12 @@ export async function extractReceiptData(formData: FormData) {
       role: "user",
       parts: [
         {
+          inlineData: {
+            mimeType,
+            data: base64Data,
+          },
+        },
+        {
           text: `
     <role>
     You are an AI finance assistant who extracts transaction details from receipts.
@@ -46,12 +52,6 @@ export async function extractReceiptData(formData: FormData) {
     ${new Date().toISOString()}
     </instruction>
           `,
-        },
-        {
-          inlineData: {
-            mimeType,
-            data: base64Data,
-          },
         },
       ],
     },

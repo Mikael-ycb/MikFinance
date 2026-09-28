@@ -7,7 +7,7 @@ import { handleWizardTools } from "@/features/ai/wizard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon, SendIcon, SparklesIcon } from "lucide-react";
-import { KeyboardEvent } from "react";
+import { KeyboardEvent, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
@@ -18,6 +18,9 @@ const formScema = z.object({
 });
 
 export default function WizardInput({ refetch }: { refetch: () => void }) {
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const form = useForm<z.infer<typeof formScema>>({
     resolver: zodResolver(formScema),
     defaultValues: {
@@ -46,7 +49,10 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
   });
 
   function onSubmit(data: z.infer<typeof formScema>) {
-    mutate(data.message);
+    mutate({
+      role: "user",
+      parts: [{ text: data.message }],
+    });
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {

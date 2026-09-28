@@ -65,18 +65,21 @@ export async function handleWizardInput(message: string) {
   return "Create transaction success";
 }
 
-export async function handleWizardTools(message: string) {
-  const contents: Content[] = [
-    {
-      role: "user",
-      parts: [
-        {
-          text: `
+export async function handleWizardTools(content: Content) {
+  let contents: Content[] = [];
+  const isText = !!content?.parts?.[0]?.text;
+
+  contents.push({
+    role: content.role,
+    parts: [
+      ...(!isText && content?.parts?.[0] ? [content.parts[0]] : []),
+      {
+        text: `
   <role>
-    You are an AI Wizard finance assistant, who can extract transaction details from text.
+    You are an AI Wizard finance assistant, who can extract transaction details from ${isText ? "text" : "audio"}.
   </role>
   <instruction>
-  - Extract the transaction detail from the following text.
+  - Extract the transaction detail from ${isText ? "the following text" : "the audio file"}.
   - If request is to update or delete transaction, you must call function get_treansaction first to find out which transaction will be updated or deleted. 
   - When update transaction, args must return from get_transaction before with fully like in schema.
   - The final response if there are no more functions being called is as simple as possible.
@@ -84,13 +87,16 @@ export async function handleWizardTools(message: string) {
   <context>
     Current Date:  ${new Date().toISOString()}
   </context>
-  <input>
-      Text to extract: ${message}
-  </input>`,
-        },
-      ],
-    },
-  ];
+  ${
+    isText &&
+    `<input>
+      Text to extract: ${content.parts?.[0]?.text}
+  </input>`
+  }
+  `,
+      },
+    ],
+  });
 
   const ai = createAI();
   let running = true;

@@ -48,7 +48,7 @@ export async function handleWizardInput(message: string) {
   `;
   const ai = createAI();
   const response = await ai.models.generateContent({
-    model: "gemini-3.5-flash",
+    model: "gemini-3.6-flash",
     contents,
     config: {
       responseMimeType: "application/json",
@@ -67,7 +67,7 @@ export async function handleWizardInput(message: string) {
 
 export async function handleWizardTools(formData: FormData) {
   const file = formData.get("file") as File;
-  const request = formData.get("request") as File;
+  const request = formData.get("request") as string;
   const type = formData.get("type") as "audio" | "text";
   if (type === "audio" && !file) {
     throw new Error("No File Uploaded");
@@ -99,10 +99,10 @@ export async function handleWizardTools(formData: FormData) {
       {
         text: `
   <role>
-    You are an AI Wizard finance assistant, who can extract transaction details from ${type === "text" ? "text" : "audio"}.
+    You are an AI Wizard finance assistant, who can extract transaction details from ${type}.
   </role>
   <instruction>
-  - Extract the transaction detail from ${type === "text" ? "the following text" : "the audio file"}.
+  - Extract the transaction detail from ${type === "text" ? "the following text" : "the audio file"} in bahasa Indonesia.
   - If request is to update or delete transaction, you must call function get_treansaction first to find out which transaction will be updated or deleted. 
   - When update transaction, args must return from get_transaction before with fully like in schema.
   - The final response if there are no more functions being called is as simple as possible.
@@ -114,7 +114,7 @@ export async function handleWizardTools(formData: FormData) {
     type === "text" &&
     `<input>
       Text to extract: ${request}
-  </input>`
+    </input>`
   }
   `,
       },
@@ -125,7 +125,7 @@ export async function handleWizardTools(formData: FormData) {
   let running = true;
   while (running) {
     const response = await ai.models.generateContent({
-      model: "gemini-3.7-flash",
+      model: "gemini-3.6-flash",
       contents,
       config: {
         tools: [

@@ -104,6 +104,8 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
       setIsRecording(false);
     }
   };
+
+  const isText = form.watch("message") !== "";
   return (
     <Card className="w-full border-primary/20 p-0">
       <CardContent className="pr-2">
@@ -122,7 +124,13 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
                 <input
                   {...field}
                   id="form-message"
-                  placeholder="Write your Transaction here"
+                  placeholder={
+                    isRecording
+                      ? "Listening..."
+                      : isPending && !field.value
+                        ? "Processing your request"
+                        : "Manage your transaction here"
+                  }
                   autoComplete="off"
                   className="h-14 focus:outline-none"
                   onKeyDown={handleKeyDown}
@@ -132,17 +140,24 @@ export default function WizardInput({ refetch }: { refetch: () => void }) {
             )}
           />
           <Button
-            type={form.watch("message") !== "" ? "submit" : "button"}
+            type={isText ? "submit" : "button"}
             size="icon"
             variant="ghost"
             disabled={isPending}
+            onClick={
+              !isText
+                ? isRecording
+                  ? stopRecording
+                  : startRecording
+                : undefined
+            }
           >
             {isPending ? (
               <Loader2Icon className="size-5 animat-spin" />
-            ) : form.watch("message") !== "" ? (
+            ) : isText ? (
               <SendIcon className="size-5" />
             ) : isRecording ? (
-              <SquareIcon className="='text-red-500 size-5 animate-pulse" />
+              <SquareIcon className="='text-red-500 fill-red-500 size-5 animate-pulse" />
             ) : (
               <MicIcon className="size-5" />
             )}

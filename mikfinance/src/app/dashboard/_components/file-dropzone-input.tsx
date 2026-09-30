@@ -103,7 +103,7 @@ export default function FileDropzoneInput({
         <div className="flex flex-col items-cente gap-2">
           <UploadCloudIcon
             className={cn(
-              "size-8",
+              "size-8 text-center",
               isDragging ? "text-primary" : "text-muted-foreground",
             )}
           />

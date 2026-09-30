@@ -100,10 +100,10 @@ export default function FileDropzoneInput({
           <p className="text-xs font-medium">AI is processing receipt</p>
         </div>
       ) : (
-        <div className="flex flex-col items-cente gap-2">
+        <div className="flex flex-col items-center gap-2">
           <UploadCloudIcon
             className={cn(
-              "size-8 text-center",
+              "size-8",
               isDragging ? "text-primary" : "text-muted-foreground",
             )}
           />

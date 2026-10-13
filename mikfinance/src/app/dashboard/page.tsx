@@ -16,6 +16,7 @@ export default function DashboardPage() {
           money
         </p>
       </section>
+      <DashboardContent />
     </div>
   );
 }
